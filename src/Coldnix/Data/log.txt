@@ -1,0 +1,21 @@
+
+---------------------------------------------------
+Log service started
+loaded file "Coldnix/OSPrograms/log.lua"
+start loading file "Coldnix/Kernel/TaskScheduler.lua"
+loaded file "Coldnix/Kernel/TaskScheduler.lua"
+start loading file "Coldnix/Kernel/EventManager.lua"
+loaded file "Coldnix/Kernel/EventManager.lua"
+start loading file "Coldnix/Kernel/Terminal.lua"
+Added task id: "CursorBlink", with interval: 0.2 sec
+New event registered, name: "TerminalInput" for event: "key_down"
+loaded file "Coldnix/Kernel/Terminal.lua"
+start loading file "Coldnix/Debug/GPUCommandLog.lua"
+loaded file "Coldnix/Debug/GPUCommandLog.lua"
+start loading file "Coldnix/Kernel/systemStatus.lua"
+Added task id: "StatusBarUpdate", with interval: 0.5 sec
+loaded file "Coldnix/Kernel/systemStatus.lua"
+start loading file "Coldnix/Kernel/CommandProcessor.lua"
+loaded file "Coldnix/Kernel/CommandProcessor.lua"
+start loading file "Coldnix/Debug/KeyboardInputTest.lua"
+loaded file "Coldnix/Debug/KeyboardInputTest.lua"
