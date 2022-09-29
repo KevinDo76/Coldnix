@@ -22,4 +22,4 @@ end
 
 Log.writeLog("")
 Log.writeLog("---------------------------------------------------")
-Log.writeLog("Log service started")
+Log.writeLog("Log started")

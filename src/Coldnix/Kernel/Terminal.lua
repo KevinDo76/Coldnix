@@ -81,7 +81,7 @@ terminal.clearScreen = function()
     print("cleared")
 end
 --terminal.reload() will clear out the terminal and force a re-render of everything
-terminal.reload = function()
+terminal.reload = function() --need to optimize later ok nerd
     local gpu=BOOTGPUPROXY
     gpu.setBackground(0x000000)
     gpu.setForeground(0xffffff)

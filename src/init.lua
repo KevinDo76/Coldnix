@@ -21,6 +21,7 @@ local systemFiles={
     "Coldnix/Debug/KeyboardInputTest.lua",
 }
 local ErrorCode={}
+
 --getting the bootdrive
 _G.BOOTDRIVEADDRESS=computer.getBootAddress()
 _G.BOOTDRIVEPROXY=component.proxy(BOOTDRIVEADDRESS)
@@ -63,7 +64,6 @@ _G.BOOTDRIVEPROXY=component.proxy(BOOTDRIVEADDRESS)
     --adding in loadstring, practically the most important function for the OS
     _G.loadstring=function (str,envname,errorOnFail)
         envname=envname or "loadstring_env"
-        --str=string.format('local succ,err=pcall(function() ',envname)..str..string.format([==[ end) if not succ then KernelPanic(err) end]==],envname)
         local func,errorm=load(str,"="..envname,"bt",_G)
         if func then
             return func
@@ -116,9 +116,12 @@ _G.BOOTGPUPROXY=component.proxy(BOOTGPUADDRESS)
 --launching other operating system system files
 for i,v in ipairs(systemFiles) do
     if Log then
-        Log.writeLog(string.format('start loading file "%s"',v))
+        Log.writeLog(string.format('loading file "%s"',v))
     end
-    loadfile(v)()
+    local suc,err=pcall(function() loadfile(v)() end)
+    if not suc then
+        KernelPanic(err)
+    end
     if Log then
         Log.writeLog(string.format('loaded file "%s"',v))
     end
@@ -130,5 +133,10 @@ end
 print("done loading")
 --main loops for the computer that keeps it running and run other programs
 while true do
-    wait(0.01)
+    local s,e = pcall(function ()
+        wait(0.01)
+    end)
+    if not s then
+        KernelPanic(e)
+    end
 end
