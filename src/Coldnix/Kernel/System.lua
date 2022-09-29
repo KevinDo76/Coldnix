@@ -24,6 +24,13 @@ System.readfile= function(path)
     end
 end
 
+System.utility.padText = function (txt,length)
+    while (#txt<length) do
+        txt=txt.." "
+    end
+    return txt
+end
+
 System.utility.floatCut = function (num,fdc)
     fdc=fdc or 1
     return math.floor(num*(10^fdc))/(10^fdc)

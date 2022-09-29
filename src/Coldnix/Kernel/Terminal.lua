@@ -60,14 +60,21 @@ _G.print = function(...)
     end
     txt=string.sub(txt,1,#txt-1)
     local textChunk={}
+    local finalChunk={}
     --the inputted text might be too long to be displayed on the same line
     --chopping it up is needed
-    repeat
-        textChunk[#textChunk+1] = string.sub(txt,1,terminal.width)
-        txt=string.sub(txt,terminal.width+1,#txt)
-    until #txt<1
+    --linebreak too
 
+    textChunk=string.split(txt,"\n")
+    
     for i,v in ipairs(textChunk) do
+        repeat
+            finalChunk[#finalChunk+1] = string.sub(v,1,terminal.width)
+            v=string.sub(v,terminal.width+1,#v)
+        until #v<1 
+    end
+
+    for i,v in ipairs(finalChunk) do
         lowPrint(v)
     end
 end
