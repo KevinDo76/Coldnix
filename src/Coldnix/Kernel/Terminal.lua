@@ -13,6 +13,7 @@ terminal.CursorState=false
 terminal.CursorFlashFreeze=computer.uptime()
 terminal.typeBarYOffset=0
 terminal.commandProcessor = function (rawText) end
+local moveDB=computer.uptime()
 local typeBuffer=""
 local typeHistory={}
 local typeHisIndex=1
@@ -90,8 +91,6 @@ terminal.reload = function() --need to optimize later ok nerd
     for i=startp,endp,-1 do
         if terminal.screenHistory[i]~=nil then
             --lowPrint(terminal.screenHistory[i])
-            gpu.setBackground(0x000000)
-            gpu.setForeground(0xffffff)
             gpu.set(terminal.x,terminal.y+terminal.height-2-terminal.typeBarYOffset-yoff,terminal.screenHistory[i-pageScroll] or "")
             yoff=yoff+1
         end
@@ -151,8 +150,8 @@ terminal.updateCursor = function (state)
     local cursorPos=terminal.CursorX+#terminal.prefix
     local lineOffset=math.floor(((cursorPos)/terminal.width))
     local lineOx=cursorPos-(lineOffset*terminal.width)
-    local cx=math.clamp(lineOx+terminal.x,1,terminal.x-1+terminal.width)
-    local cy=math.clamp(terminal.y+terminal.height-1-terminal.typeBarYOffset+lineOffset,1,ry)
+    local cx=math.clamp(lineOx+terminal.x,terminal.x,terminal.x-1+terminal.width)
+    local cy=math.clamp(terminal.y+terminal.height-1-terminal.typeBarYOffset+lineOffset,terminal.y,ry)
     local text=gpu.get(cx,cy)
     --local text=" "
     if state then
@@ -164,7 +163,7 @@ end
 
 terminal.type = function (txt)
     typeBuffer=string.sub(typeBuffer,1,terminal.CursorX)..txt..string.sub(typeBuffer,terminal.CursorX+1,#typeBuffer)
-    terminal.CursorX=terminal.CursorX+1
+    terminal.CursorX=terminal.CursorX+#txt
     terminal.CursorFlashFreeze=computer.uptime()+0.5
     terminal.updateTypeBar()
     terminal.updateCursor(true)
@@ -258,14 +257,20 @@ EventManager.regsisterListener("TerminalInput","key_down",function(componentId,a
         terminal.delete()
     end
     if keyboardcode==205 then
-        terminal.CursorFlashFreeze=computer.uptime()+0.5
-        terminal.moveCursor(1)
-        terminal.updateCursor(true)
+        if moveDB<=computer.uptime() then
+            moveDB=computer.uptime()+0.02
+            terminal.CursorFlashFreeze=computer.uptime()+0.5
+            terminal.updateCursor(true)
+            terminal.moveCursor(1)
+        end
     end
     if keyboardcode==203 then
-        terminal.CursorFlashFreeze=computer.uptime()+0.5
-        terminal.moveCursor(-1)
-        terminal.updateCursor(true)
+        if moveDB<=computer.uptime() then
+            moveDB=computer.uptime()+0.02
+            terminal.CursorFlashFreeze=computer.uptime()+0.5
+            terminal.updateCursor(true)
+            terminal.moveCursor(-1)
+        end
     end
     if keyboardcode==28 then
         terminal.enter()
@@ -318,6 +323,10 @@ EventManager.regsisterListener("TerminalInput","key_down",function(componentId,a
             terminal.reload()
         end
     end
+end)
+
+EventManager.regsisterListener("TerminalClipboard","clipboard", function(_,text) 
+    terminal.type(text)
 end)
 --final init 
 terminal.updateTypeBar()

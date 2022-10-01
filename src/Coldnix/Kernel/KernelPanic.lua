@@ -4,12 +4,11 @@ function KernelPanic(err)
     pcall(function() Log.writeLog("\nUnhandled error: "..err.."\nfatal error") end)
     --local variables
     local rx,ry=BOOTGPUPROXY.getResolution()
-    BOOTGPUPROXY.setBackground(0x000000)
-    BOOTGPUPROXY.setForeground(0xffffff)
-    BOOTGPUPROXY.fill(1,1,rx,ry," ")
+   
+
     local txtChunk={}
     local width=rx-6
-    err="An unhandled error had occured\nError Message: "..err.."\n \nPress any key to restart\nSystem Memory at crash: "..tostring(computer.freeMemory()/1024).."kb"
+    err="An unhandled error had occured\nError Message: "..err.."\n \nSystem Memory at crash: "..tostring(computer.freeMemory()/1024).."kb".."\nPress any key to restart"
     --local functions
     local function ewait(sec)
         local endTime=computer.uptime()+sec
@@ -54,12 +53,66 @@ function KernelPanic(err)
             v=string.sub(v,width+1,#v)
         until #v<1 
     end
+    --screen clear
+    if BOOTGPUPROXY.getDepth()>1 then
+        BOOTGPUPROXY.setBackground(0x0000ff)
+    else
+        BOOTGPUPROXY.setBackground(0x000000)
+    end
+    
+    BOOTGPUPROXY.setForeground(0xffffff)
+    BOOTGPUPROXY.fill(1,1,rx,ry," ")
+    --draw sadface
+    BOOTGPUPROXY.setForeground(0xffffff)
+    BOOTGPUPROXY.setBackground(0xffffff)
+    --eyes
+    BOOTGPUPROXY.set(5,4,"#")
+    BOOTGPUPROXY.set(4,4,"#")
+    ewait(0.05)
+    BOOTGPUPROXY.set(4,6,"#")
+    BOOTGPUPROXY.set(5,6,"#")
+    --mouth
+    BOOTGPUPROXY.set(8,4,"#")
+    BOOTGPUPROXY.set(9,4,"#")
+    ewait(0.05)
+    BOOTGPUPROXY.set(8,5,"#")
+    BOOTGPUPROXY.set(9,5,"#")
+    ewait(0.05)
+    BOOTGPUPROXY.set(8,6,"#")
+    BOOTGPUPROXY.set(9,6,"#")
+    ewait(0.05)
+    BOOTGPUPROXY.set(10,7,"#")
+    BOOTGPUPROXY.set(11,7,"#")
+    ewait(0.05)
+    BOOTGPUPROXY.set(10,3,"#")
+    BOOTGPUPROXY.set(11,3,"#")
+    ewait(0.05)
+    BOOTGPUPROXY.set(12,8,"#")
+    BOOTGPUPROXY.set(13,8,"#")
+    ewait(0.05)
+    BOOTGPUPROXY.set(12,2,"#")
+    BOOTGPUPROXY.set(13,2,"#")
+    ewait(0.05)
+    BOOTGPUPROXY.set(14,8,"#")
+    BOOTGPUPROXY.set(15,8,"#")
+    ewait(0.05)
+    BOOTGPUPROXY.set(14,2,"#")
+    BOOTGPUPROXY.set(15,2,"#")
+    ewait(0.2)
     --outprint
+    if BOOTGPUPROXY.getDepth()>1 then
+        BOOTGPUPROXY.setBackground(0x0000ff)
+    else
+        BOOTGPUPROXY.setBackground(0x000000)
+    end
+    
+    BOOTGPUPROXY.setForeground(0xffffff)
     for i,v in ipairs(finaChunk) do
-        BOOTGPUPROXY.set(4,i,v)
+        ewait(0.1)
+        BOOTGPUPROXY.set(4,i+9,v)
     end
     while true do
-        ewait(0.5)
+        ewait(0.05)
         computer.beep(1000,0.1)
     end
 end
