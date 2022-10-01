@@ -9,7 +9,7 @@ function KernelPanic(err)
     BOOTGPUPROXY.fill(1,1,rx,ry," ")
     local txtChunk={}
     local width=rx-6
-    err="An unhandled error had occured\nError Message: "..err.."\n \nPress any key to restart"
+    err="An unhandled error had occured\nError Message: "..err.."\n \nPress any key to restart\nSystem Memory at crash: "..tostring(computer.freeMemory()/1024).."kb"
     --local functions
     local function ewait(sec)
         local endTime=computer.uptime()+sec

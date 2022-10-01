@@ -20,7 +20,6 @@ local systemFiles={
     "Coldnix/Kernel/CommandProcessor.lua",
     "Coldnix/Debug/KeyboardInputTest.lua",
 }
-local ErrorCode={}
 
 --getting the bootdrive
 _G.BOOTDRIVEADDRESS=computer.getBootAddress()
@@ -130,6 +129,7 @@ for i,v in ipairs(systemFiles) do
         print("loaded file \""..v.."\"")
     end
 end
+
 print("done loading")
 --main loops for the computer that keeps it running and run other programs
 while true do

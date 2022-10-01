@@ -16,8 +16,9 @@ terminal.commandProcessor = function (rawText) end
 local typeBuffer=""
 local typeHistory={}
 local typeHisIndex=1
-local maxHistorySize=terminal.height+20
+local maxHistorySize=terminal.height+50
 local lastoffset=0
+local pageScroll=0
 local waitingForTextInput=false
 --spacePadding to fill in the rest of the empty space with text to makes sure it overwrite the last line
 terminal.padText = function(text,length)
@@ -32,21 +33,12 @@ local function lowPrint(text)
     local gpu=BOOTGPUPROXY
     gpu.setBackground(0x000000)
     gpu.setForeground(0xffffff)
-    gpu.copy(terminal.x,terminal.y+1,terminal.width,terminal.height-2-terminal.typeBarYOffset,0,-1)
-    gpu.set(terminal.x,terminal.y+terminal.height-2-terminal.typeBarYOffset,text)
-end
---print specifically for re rendering the screen
-local function reloadPrint(text)
-    text=tostring(text)
-    local textChunk={}
-    repeat
-        textChunk[#textChunk+1] = string.sub(text,1,terminal.width)
-        text=string.sub(text,terminal.width+1,#text)
-    until #text<1
-    for i,v in pairs(textChunk) do
-        lowPrint(v)
+    if terminal.y+terminal.height-2-terminal.typeBarYOffset>=terminal.y then
+        gpu.copy(terminal.x,terminal.y+1,terminal.width,terminal.height-2-terminal.typeBarYOffset,0,-1)
+        gpu.set(terminal.x,terminal.y+terminal.height-2-terminal.typeBarYOffset,text)
     end
 end
+--print specifically for re rendering the screen
 --global print
 _G.print = function(...)
     local txt=""
@@ -54,17 +46,11 @@ _G.print = function(...)
     for i,v in pairs(args) do
         txt=txt..tostring(v).." "
     end
-    terminal.screenHistory[#terminal.screenHistory+1] = txt
-    if #terminal.screenHistory>maxHistorySize then
-        table.remove(terminal.screenHistory,1)
-    end
+
     txt=string.sub(txt,1,#txt-1)
     local textChunk={}
     local finalChunk={}
-    --the inputted text might be too long to be displayed on the same line
-    --chopping it up is needed
-    --linebreak too
-
+    --linebreak
     textChunk=string.split(txt,"\n")
     
     for i,v in ipairs(textChunk) do
@@ -75,6 +61,12 @@ _G.print = function(...)
     end
 
     for i,v in ipairs(finalChunk) do
+        --the inputted text might be too long to be displayed on the same line
+        --chopping it up is needed
+        terminal.screenHistory[#terminal.screenHistory+1] = v
+        if #terminal.screenHistory>maxHistorySize then
+            table.remove(terminal.screenHistory,1)
+        end
         lowPrint(v)
     end
 end
@@ -85,17 +77,23 @@ terminal.clearScreen = function()
     terminal.CursorX=0
     terminal.screenHistory={}
     terminal.reload()
-    print("cleared")
 end
 --terminal.reload() will clear out the terminal and force a re-render of everything
 terminal.reload = function() --need to optimize later ok nerd
     local gpu=BOOTGPUPROXY
+    local yoff=0
     gpu.setBackground(0x000000)
     gpu.setForeground(0xffffff)
     gpu.fill(terminal.x,terminal.y,terminal.width,terminal.height," ")
-    for i=#terminal.screenHistory-terminal.height-terminal.typeBarYOffset,#terminal.screenHistory do
+    local startp=#terminal.screenHistory
+    local endp=#terminal.screenHistory-terminal.height+terminal.typeBarYOffset+2
+    for i=startp,endp,-1 do
         if terminal.screenHistory[i]~=nil then
-            reloadPrint(terminal.screenHistory[i])
+            --lowPrint(terminal.screenHistory[i])
+            gpu.setBackground(0x000000)
+            gpu.setForeground(0xffffff)
+            gpu.set(terminal.x,terminal.y+terminal.height-2-terminal.typeBarYOffset-yoff,terminal.screenHistory[i-pageScroll] or "")
+            yoff=yoff+1
         end
     end
     terminal.CursorFlashFreeze=computer.uptime()+0.5
@@ -140,7 +138,7 @@ terminal.updateTypeBar = function ()
     until #txt<1
     gpu.setBackground(0x000000)
     gpu.setForeground(0xffffff)
-    for i=1,lineCount+1 do
+    for i=math.max(terminal.typeBarYOffset-terminal.height+2,1),terminal.typeBarYOffset+1 do
         gpu.set(terminal.x,terminal.y+terminal.height-1-terminal.typeBarYOffset+(i-1),terminal.padText(textChunk[i] or "",terminal.width))
     end
 end
@@ -212,8 +210,12 @@ end
 terminal.enter = function()
     local t=typeBuffer
     typeBuffer=""
-    terminal.CursorX=0
     print(terminal.prefix..t)
+    if pageScroll>0 then
+        pageScroll=0
+        terminal.reload()
+    end
+    terminal.CursorX=0
     terminal.updateTypeBar()
     terminal.updateCursor(true)
     typeHistory[#typeHistory+1]=t
@@ -303,6 +305,18 @@ EventManager.regsisterListener("TerminalInput","key_down",function(componentId,a
         terminal.CursorX=#typeBuffer
         terminal.CursorFlashFreeze=computer.uptime()+0.5
         terminal.updateCursor(true)
+    end
+    if keyboardcode==201 then
+        if pageScroll<#terminal.screenHistory-terminal.height+1+terminal.typeBarYOffset then
+            pageScroll=pageScroll+1
+            terminal.reload()
+        end
+    end
+    if keyboardcode==209 then
+        if pageScroll>0 then
+            pageScroll=pageScroll-1
+            terminal.reload()
+        end
     end
 end)
 --final init 

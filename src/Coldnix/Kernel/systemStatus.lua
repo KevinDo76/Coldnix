@@ -14,3 +14,4 @@ local memoryText=terminal.padText("|Memory: "..(System.utility.floatCut(computer
 BOOTGPUPROXY.set(1,2,memoryText)
 BOOTGPUPROXY.set(1,3,"|"..string.rep("_",x-2).."|")
 ]==],tonumber(config.configList.STATUSBARUPDATERATE))
+

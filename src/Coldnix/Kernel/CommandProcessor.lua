@@ -22,14 +22,18 @@ end
 local function response(rawText)
     local splitText=string.split(rawText," ")
     local commandName=splitText[1]
-    print(" ")
-    if validCommands[commandName] then
-        if keepinmem==1 then
-            validCommands[commandName].func(rawText)
-        else
-            local metadata=validCommands[commandName]
-            local file=loadfile(commandDir.."/"..metadata[3])()
-            file.func(rawText)
+    if commandName~=nil then
+        print(string.rep("^",math.min(#rawText+#terminal.prefix,terminal.width)))
+        if validCommands[commandName] then
+            if keepinmem==1 then
+                validCommands[commandName].func(rawText)
+            else
+                local metadata=validCommands[commandName]
+                local file=loadfile(commandDir.."/"..metadata[3])()
+                file.func(rawText)
+            end
+        else 
+            print('Unknown command "'..commandName..'", use "help" for a list of avaliable commands')
         end
     end
 end
