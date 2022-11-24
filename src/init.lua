@@ -11,7 +11,7 @@ local systemFiles={
     "Coldnix/Kernel/System.lua",    
     "Coldnix/Kernel/config.lua",
     "Coldnix/Kernel/KernelPanic.lua",
-    "Coldnix/OSPrograms/log.lua",
+    "Coldnix/Kernel/log.lua",
     "Coldnix/Kernel/TaskScheduler.lua",
     "Coldnix/Kernel/EventManager.lua",
     "Coldnix/Kernel/Terminal.lua",

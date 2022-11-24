@@ -1,6 +1,7 @@
 --A custom "bluescreen" for the os
 --could be usefull fatal crash debugging
 function KernelPanic(err)
+    err=err or "No error message provided"
     pcall(function() Log.writeLog("\nUnhandled error: "..err.."\nfatal error") end)
     --local variables
     local rx,ry=BOOTGPUPROXY.getResolution()

@@ -1,8 +1,12 @@
 local module = {}
+    module.id=2
     module.name="lua"
     module.description="Lua interpreter"
     module.func = function (rawText)
-        print("starting ".._VERSION.." Terminal")
-        loadfile("/Coldnix/OSPrograms/luaProcessorProgram.lua")()
+        local func=loadfile("/Coldnix/OSPrograms/luaProcessorProgram.lua")
+        if func then
+            func()
+        end
+        func=nil
     end
 return module

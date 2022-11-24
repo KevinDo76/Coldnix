@@ -1,4 +1,5 @@
 local module = {}
+    module.id=4
     module.name="clr"
     module.description='clear the terminal\nuse flag "rl" to reload instead'
     module.func = function (rawText)

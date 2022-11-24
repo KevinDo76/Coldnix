@@ -1,3 +1,4 @@
+print("starting ".._VERSION.." Terminal")
 commandAPI.noCommandProcess=true
 terminal.prefix=_VERSION..": "
 terminal.reload()

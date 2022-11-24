@@ -7,7 +7,8 @@ TERMINALHOFF=-3
 STATUSBARUPDATERATE=0.5
 COMMANDSDIRECTORY=/OS/Commands
 MAXUSERTYPEHISTORY=25
-LOADCOMMANDCODEINTOMEM=1]==]
+LOADCOMMANDCODEINTOMEM=1
+HELPCOMMANDPERPAGE=5]==]
 --functions
 _G.config.reflashConfig = function ()
     System.writefile(configLocation,defaultConfigFile)

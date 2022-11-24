@@ -1,6 +1,7 @@
 local module = {}
+    module.id=5
     module.name="task"
-    module.description="task"
+    module.description="TaskSchedular utility"
     module.func = function (rawText)
        local args=string.split(rawText," ")
        if args[2]=="list" then

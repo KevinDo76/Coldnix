@@ -1,4 +1,5 @@
 local module = {}
+    module.id=3
     module.name="exc"
     module.description='execute an executable at <path>'
     module.func = function (rawText)

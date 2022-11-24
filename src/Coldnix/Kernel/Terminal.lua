@@ -13,6 +13,7 @@ terminal.CursorState=false
 terminal.CursorFlashFreeze=computer.uptime()
 terminal.typeBarYOffset=0
 terminal.commandProcessor = function (rawText) end
+local processing=true
 local moveDB=computer.uptime()
 local typeBuffer=""
 local typeHistory={}
@@ -30,13 +31,15 @@ terminal.padText = function(text,length)
 end
 --internal print
 local function lowPrint(text)
-    text=terminal.padText(string.sub(text,1,terminal.width),terminal.width)
-    local gpu=BOOTGPUPROXY
-    gpu.setBackground(0x000000)
-    gpu.setForeground(0xffffff)
-    if terminal.y+terminal.height-2-terminal.typeBarYOffset>=terminal.y then
-        gpu.copy(terminal.x,terminal.y+1,terminal.width,terminal.height-2-terminal.typeBarYOffset,0,-1)
-        gpu.set(terminal.x,terminal.y+terminal.height-2-terminal.typeBarYOffset,text)
+    if processing then
+        text=terminal.padText(string.sub(text,1,terminal.width),terminal.width)
+        local gpu=BOOTGPUPROXY
+        gpu.setBackground(0x000000)
+        gpu.setForeground(0xffffff)
+        if terminal.y+terminal.height-2-terminal.typeBarYOffset>=terminal.y then
+            gpu.copy(terminal.x,terminal.y+1,terminal.width,terminal.height-2-terminal.typeBarYOffset,0,-1)
+            gpu.set(terminal.x,terminal.y+terminal.height-2-terminal.typeBarYOffset,text)
+        end
     end
 end
 --print specifically for re rendering the screen
@@ -80,85 +83,115 @@ terminal.clearScreen = function()
     terminal.reload()
 end
 --terminal.reload() will clear out the terminal and force a re-render of everything
-terminal.reload = function() --need to optimize later ok nerd
-    local gpu=BOOTGPUPROXY
-    local yoff=0
-    gpu.setBackground(0x000000)
-    gpu.setForeground(0xffffff)
-    gpu.fill(terminal.x,terminal.y,terminal.width,terminal.height," ")
-    local startp=#terminal.screenHistory
-    local endp=#terminal.screenHistory-terminal.height+terminal.typeBarYOffset+2
-    for i=startp,endp,-1 do
-        if terminal.screenHistory[i]~=nil then
-            --lowPrint(terminal.screenHistory[i])
-            gpu.set(terminal.x,terminal.y+terminal.height-2-terminal.typeBarYOffset-yoff,terminal.screenHistory[i-pageScroll] or "")
-            yoff=yoff+1
+terminal.reload = function()
+    if processing then
+        local gpu=BOOTGPUPROXY
+        local yoff=0
+        gpu.setBackground(0x000000)
+        gpu.setForeground(0xffffff)
+        gpu.fill(terminal.x,terminal.y,terminal.width,terminal.height," ")
+        local startp=#terminal.screenHistory
+        local endp=#terminal.screenHistory-terminal.height+terminal.typeBarYOffset+2
+        for i=startp,endp,-1 do
+            if terminal.screenHistory[i]~=nil then
+                --lowPrint(terminal.screenHistory[i])
+                gpu.set(terminal.x,terminal.y+terminal.height-2-terminal.typeBarYOffset-yoff,terminal.screenHistory[i-pageScroll] or "")
+                yoff=yoff+1
+            end
         end
+        terminal.CursorFlashFreeze=computer.uptime()+0.5
+        terminal.updateTypeBar()
+        terminal.updateCursor(true)
     end
-    terminal.CursorFlashFreeze=computer.uptime()+0.5
-    terminal.updateTypeBar()
-    terminal.updateCursor(true)
 end
 --functions for changing sizes and position of the terminal
 terminal.setSize = function (x,y)
-    BOOTGPUPROXY.setBackground(0x000000)
-    BOOTGPUPROXY.setForeground(0xffffff)
-    BOOTGPUPROXY.fill(terminal.x,terminal.y,terminal.width,terminal.height," ")
-    terminal.width=x
-    terminal.height=math.max(y,2)
-    terminal.reload()
+    if processing then
+        BOOTGPUPROXY.setBackground(0x000000)
+        BOOTGPUPROXY.setForeground(0xffffff)
+        BOOTGPUPROXY.fill(terminal.x,terminal.y,terminal.width,terminal.height," ")
+        terminal.width=x
+        terminal.height=math.max(y,2)
+        terminal.reload()
+    end
 end
 
 terminal.setPosition = function (x,y)
-    BOOTGPUPROXY.setBackground(0x000000)
-    BOOTGPUPROXY.setForeground(0xffffff)
-    BOOTGPUPROXY.fill(terminal.x,terminal.y,terminal.width,terminal.height," ")
-    terminal.x=x
-    terminal.y=y
+    if processing then
+        BOOTGPUPROXY.setBackground(0x000000)
+        BOOTGPUPROXY.setForeground(0xffffff)
+        BOOTGPUPROXY.fill(terminal.x,terminal.y,terminal.width,terminal.height," ")
+        terminal.x=x
+        terminal.y=y
+        terminal.reload()
+    end
+end
+
+terminal.resumeProcess = function()
+    processing = true
+    TaskSchedular.resumeTask("StatusBarUpdate")
+    TaskSchedular.resumeTask("CursorBlink")
+    EventManager.resumeListener("TerminalInput")
+    EventManager.resumeListener("TerminalClipboard")
     terminal.reload()
+end
+
+terminal.stopProcess = function(clearScreen)
+    processing = false
+    TaskSchedular.pauseTask("StatusBarUpdate")
+    TaskSchedular.pauseTask("CursorBlink")
+    EventManager.pauseListener("TerminalInput")
+    EventManager.pauseListener("TerminalClipboard")
+    if clearScreen then
+        BOOTGPUPROXY.fill(terminal.x,terminal.y,terminal.width,terminal.height," ")
+    end
 end
 
 ----------------------------------
 --this part down here will handle keyboards event for the terminal
 --function for typing
 terminal.updateTypeBar = function ()
-    local gpu=BOOTGPUPROXY
-    local txt=terminal.prefix..typeBuffer
-    local lineCount=math.max(math.floor((#txt)/terminal.width),0)
-    if lineCount~=lastoffset then
-        terminal.typeBarYOffset=lineCount
-        lastoffset=lineCount
-        terminal.ChangeTypeArea(lineCount)
-    end
-    local textChunk={}
-    repeat
-        textChunk[#textChunk+1] = string.sub(txt,1,terminal.width)
-        txt=string.sub(txt,terminal.width+1,#txt)
-    until #txt<1
-    gpu.setBackground(0x000000)
-    gpu.setForeground(0xffffff)
-    for i=math.max(terminal.typeBarYOffset-terminal.height+2,1),terminal.typeBarYOffset+1 do
-        gpu.set(terminal.x,terminal.y+terminal.height-1-terminal.typeBarYOffset+(i-1),terminal.padText(textChunk[i] or "",terminal.width))
+    if processing then
+        local gpu=BOOTGPUPROXY
+        local txt=terminal.prefix..typeBuffer
+        local lineCount=math.max(math.floor((#txt)/terminal.width),0)
+        if lineCount~=lastoffset then
+            terminal.typeBarYOffset=lineCount
+            lastoffset=lineCount
+            terminal.ChangeTypeArea(lineCount)
+        end
+        local textChunk={}
+        repeat
+            textChunk[#textChunk+1] = string.sub(txt,1,terminal.width)
+            txt=string.sub(txt,terminal.width+1,#txt)
+        until #txt<1
+        gpu.setBackground(0x000000)
+        gpu.setForeground(0xffffff)
+        for i=math.max(terminal.typeBarYOffset-terminal.height+2,1),terminal.typeBarYOffset+1 do
+            gpu.set(terminal.x,terminal.y+terminal.height-1-terminal.typeBarYOffset+(i-1),terminal.padText(textChunk[i] or "",terminal.width))
+        end
     end
 end
 
 terminal.updateCursor = function (state)
-    terminal.CursorState=state
-    local gpu=BOOTGPUPROXY
-    gpu.setBackground(0x000000)
-    gpu.setForeground(0xffffff)
-    local cursorPos=terminal.CursorX+#terminal.prefix
-    local lineOffset=math.floor(((cursorPos)/terminal.width))
-    local lineOx=cursorPos-(lineOffset*terminal.width)
-    local cx=math.clamp(lineOx+terminal.x,terminal.x,terminal.x-1+terminal.width)
-    local cy=math.clamp(terminal.y+terminal.height-1-terminal.typeBarYOffset+lineOffset,terminal.y,ry)
-    local text=gpu.get(cx,cy)
-    --local text=" "
-    if state then
-        gpu.setBackground(0xffffff)
-        gpu.setForeground(0x000000)
+    if processing then
+        terminal.CursorState=state
+        local gpu=BOOTGPUPROXY
+        gpu.setBackground(0x000000)
+        gpu.setForeground(0xffffff)
+        local cursorPos=terminal.CursorX+#terminal.prefix
+        local lineOffset=math.floor(((cursorPos)/terminal.width))
+        local lineOx=cursorPos-(lineOffset*terminal.width)
+        local cx=math.clamp(lineOx+terminal.x,terminal.x,terminal.x-1+terminal.width)
+        local cy=math.clamp(terminal.y+terminal.height-1-terminal.typeBarYOffset+lineOffset,terminal.y,ry)
+        local text=gpu.get(cx,cy)
+        --local text=" "
+        if state then
+            gpu.setBackground(0xffffff)
+            gpu.setForeground(0x000000)
+        end
+        gpu.set(cx,cy,text)
     end
-    gpu.set(cx,cy,text)
 end
 
 terminal.type = function (txt)
@@ -188,22 +221,26 @@ terminal.clearType = function()
 end
 
 terminal.input = function (prefix)
-    waitingForTextInput = true
-    local previousPrefix=terminal.prefix
-    terminal.prefix=prefix or ""
-    terminal.updateTypeBar()
-    terminal.CursorFlashFreeze=computer.uptime()+0.5
-    terminal.updateCursor(true)
-    while wait(0.01) do
-        if waitingForTextInput==false then
-            break
+    if processing then
+        waitingForTextInput = true
+        local previousPrefix=terminal.prefix
+        terminal.prefix=prefix or ""
+        terminal.updateTypeBar()
+        terminal.CursorFlashFreeze=computer.uptime()+0.5
+        terminal.updateCursor(true)
+        while wait(0.01) do
+            if waitingForTextInput==false then
+                break
+            end
         end
+        terminal.prefix=previousPrefix
+        terminal.updateTypeBar()
+        terminal.CursorFlashFreeze=computer.uptime()+0.5
+        terminal.updateCursor(true)
+        return typeHistory[#typeHistory]
+    else
+        return ""
     end
-    terminal.prefix=previousPrefix
-    terminal.updateTypeBar()
-    terminal.CursorFlashFreeze=computer.uptime()+0.5
-    terminal.updateCursor(true)
-    return typeHistory[#typeHistory]
 end
 
 terminal.enter = function()

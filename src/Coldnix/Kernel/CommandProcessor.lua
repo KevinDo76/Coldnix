@@ -7,12 +7,12 @@ local commandDirList=BOOTDRIVEPROXY.list(commandDir) or {}
 local validCommands={}
 for i=1,#commandDirList do
     local file=loadfile(commandDir.."/"..commandDirList[i])()
-    if file.name and file.description and file.name then
+    if file.name and file.description and file.name and file.id then
         Log.writeLog("Valid command: "..file.name)
         if keepinmem==1 then
-            validCommands[file.name]=file
+            validCommands[file.name]={file.name,file.description,file,file.id}
         else
-            validCommands[file.name]={file.name,file.description,commandDirList[i]}
+            validCommands[file.name]={file.name,file.description,commandDirList[i],file.id}
         end
     else
         print("failed to load "..commandDir.."/"..commandDirList[i])
@@ -28,7 +28,7 @@ local function response(rawText)
             print(string.rep("^",math.min(#rawText+#terminal.prefix,terminal.width)))
             if validCommands[commandName] then
                 if keepinmem==1 then
-                    validCommands[commandName].func(rawText)
+                    validCommands[commandName][3].func(rawText)
                 else
                     local metadata=validCommands[commandName]
                     local file=loadfile(commandDir.."/"..metadata[3])()
