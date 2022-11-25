@@ -1,6 +1,6 @@
 print("starting ".._VERSION.." Terminal")
 commandAPI.noCommandProcess=true
-terminal.prefix=_VERSION..": "
+--terminal.prefix=_VERSION..": "
 terminal.reload()
 _G.exit=false
 _G.ControlDown=false
@@ -38,7 +38,7 @@ while true do
 end
 print("Exiting ".._VERSION.." Terminal")
 commandAPI.noCommandProcess=false
-terminal.prefix="Terminal: "
+--terminal.prefix="Terminal: "
 terminal.reload()
 _G.exit=nil
 _G.ControlDown=nil

@@ -24,11 +24,42 @@ System.readfile= function(path)
     end
 end
 
+System.utility.getCorrectCapName = function(path,file)
+
+end
+
 System.utility.padText = function (txt,length)
     while (#txt<length) do
         txt=txt.." "
     end
     return txt
+end
+
+System.utility.sanitizePath = function (path) 
+    while (string.sub(path,#path,#path)=="/" and #path>1) do path=string.sub(path,1,#path-1) end
+    while (string.find(path,"//")~=nil) do path=string.gsub(path,"//","/") end
+    return path
+end
+
+System.utility.resolveFilePath = function(path)
+    if string.sub(path,1,1)=="/" then
+        return System.utility.sanitizePath(path)
+    else
+        if (terminal.currentWorkingDir~="/") then
+            return System.utility.sanitizePath(terminal.currentWorkingDir.."/"..path)
+        else
+            return System.utility.sanitizePath(terminal.currentWorkingDir..path)
+        end
+    end
+end
+
+System.utility.containPeriod = function(text) 
+    for i=1,#text do
+        if string.sub(text,i,i) == "." then
+            return true
+        end
+    end
+    return false
 end
 
 System.utility.floatCut = function (num,fdc)

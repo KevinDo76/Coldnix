@@ -126,7 +126,7 @@ for i,v in ipairs(systemFiles) do
     end
 
     if print then
-        print("loaded file \""..v.."\"")
+        print("loaded file \"/"..v.."\"")
     end
 end
 

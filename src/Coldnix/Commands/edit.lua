@@ -5,19 +5,19 @@ local module = {}
     module.func = function (rawText)
         local args=System.utility.getArgs(rawText)
         if args[2] then
-            if BOOTDRIVEPROXY.exists(args[2]) then
-                if not BOOTDRIVEPROXY.isDirectory(args[2]) then
-                    _G.editorFilePath=args[2]
+            _G.editorFilePath=System.utility.resolveFilePath(args[2])
+            if BOOTDRIVEPROXY.exists(_G.editorFilePath) then
+                if not BOOTDRIVEPROXY.isDirectory(_G.editorFilePath) then
                     local func=loadfile("/Coldnix/OSPrograms/textEditor.lua")
                     if func then
                         func()
                     end
                     func=nil
                 else
-                    print('"'..args[2]..'" is a directory')
+                    print('"'.._G.editorFilePath..'" is a directory')
                 end
             else
-                print('Unable to find file "'..args[2]..'"')
+                print('Unable to find file "'.._G.editorFilePath..'"')
             end
         else
             print(module.description)
