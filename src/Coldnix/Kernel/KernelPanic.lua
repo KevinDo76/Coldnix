@@ -11,6 +11,7 @@ function KernelPanic(err)
     local width=rx-6
     err="An unhandled error had occured\nError Message: "..err.."\n \nSystem Memory at crash: "..tostring(computer.freeMemory()/1024).."kb".."\nPress any key to restart"
     --local functions
+
     local function ewait(sec)
         local endTime=computer.uptime()+sec
         while computer.uptime()<endTime do
@@ -27,6 +28,7 @@ function KernelPanic(err)
         end
         return true
     end
+    
     local function esplit(str,sep)
         local sep, fields = sep or ":", {}
         local pattern = string.format("([^%s]+)", sep)

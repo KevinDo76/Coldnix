@@ -1,7 +1,9 @@
 local args = {...}
-local editorFilePath = args[1]
-print('opening "'..System.utility.getPrefixWorkingDir()..editorFilePath..'"')
-local filetxt=System.readfile(editorFilePath,WORKINGDRIVEPROXY)
+local driveAddress=args[1]
+local drive = component.proxy(driveAddress)
+local editorFilePath = args[2]
+print('opening "'..System.utility.getPrefixWorkingDir(driveAddress)..System.utility.sanitizePath(editorFilePath)..'"')
+local filetxt=System.readfile(editorFilePath,drive)
 local yoffset=1
 local x,y=BOOTGPUPROXY.getResolution()
 local gpu=BOOTGPUPROXY

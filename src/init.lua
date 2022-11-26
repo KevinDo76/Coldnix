@@ -45,6 +45,7 @@ _G.currentWorkingDir = "/Coldnix"
         str:gsub(pattern, function(c) fields[#fields+1] = c end)
         return fields
     end
+    
     --adding in math.clamp because that's also not a thing for reasons
     function math.clamp(x,min,max)
         if x<min then
