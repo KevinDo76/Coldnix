@@ -3,10 +3,13 @@ local module = {}
     module.name="test"
     module.description="this is a test program, very nice"
     module.func = function (rawText)
-        terminal.stopProcess(true)
-        terminal.type("task list")
-        terminal.enter()
-        wait(5)
-        terminal.resumeProcess()
+        for i=1,2 do
+            for c=1,30000000 do
+                local A=2
+                local B=2
+                local C=A*B^c
+            end 
+            wait()
+        end
     end
 return module

@@ -47,8 +47,11 @@ EventManager.onSignal = function (name,...)
 end
 
 --replacing the wait() function to call onSignal
+local start=computer.uptime()
 _G.wait = function(time)
-    local endTime=computer.uptime()+time
+    local endTime=computer.uptime()+(time or 0.01)
+    computer.ElapseT=computer.uptime()-start
+    start=computer.uptime()
     while computer.uptime()<endTime do
         EventManager.onSignal(computer.pullSignal(math.clamp(endTime-computer.uptime(),0,0.01)))
         TaskSchedular.runTask()

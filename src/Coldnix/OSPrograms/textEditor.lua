@@ -1,5 +1,7 @@
-print('opening "'..editorFilePath..'"')
-local filetxt=System.readfile(editorFilePath)
+local args = {...}
+local editorFilePath = args[1]
+print('opening "'..System.utility.getPrefixWorkingDir()..editorFilePath..'"')
+local filetxt=System.readfile(editorFilePath,WORKINGDRIVEPROXY)
 local yoffset=1
 local x,y=BOOTGPUPROXY.getResolution()
 local gpu=BOOTGPUPROXY

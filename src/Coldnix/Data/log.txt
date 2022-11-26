@@ -14,7 +14,7 @@ loaded file "Coldnix/Kernel/Terminal.lua"
 loading file "Coldnix/Debug/GPUCommandLog.lua"
 loaded file "Coldnix/Debug/GPUCommandLog.lua"
 loading file "Coldnix/Kernel/systemStatus.lua"
-Added task id: "StatusBarUpdate", with interval: 0.5 sec
+Added task id: "StatusBarUpdate", with interval: 0.25 sec
 loaded file "Coldnix/Kernel/systemStatus.lua"
 loading file "Coldnix/Kernel/CommandProcessor.lua"
 Valid command: clr

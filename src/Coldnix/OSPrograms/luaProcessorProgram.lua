@@ -1,6 +1,6 @@
 print("starting ".._VERSION.." Terminal")
 commandAPI.noCommandProcess=true
---terminal.prefix=_VERSION..": "
+terminal.prefix=_VERSION..": "
 terminal.reload()
 _G.exit=false
 _G.ControlDown=false
@@ -27,7 +27,7 @@ while true do
         if func then
             local succ,err=pcall(function() func() end)
             if not succ then
-                print("Runtime error: "..err)
+                print("Runtime error: "..(err or "nil"))
             end
         else
             print(err)
@@ -38,7 +38,7 @@ while true do
 end
 print("Exiting ".._VERSION.." Terminal")
 commandAPI.noCommandProcess=false
---terminal.prefix="Terminal: "
+terminal.prefix=System.utility.getPrefixWorkingDir()..currentWorkingDir..": "
 terminal.reload()
 _G.exit=nil
 _G.ControlDown=nil

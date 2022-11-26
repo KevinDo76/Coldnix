@@ -12,7 +12,7 @@ local module = {}
                 longestLength=#i
             end
         end
-        print(System.utility.padText("Name",longestLength+3).."Running")
+        print(System.utility.padText("Name",math.max(longestLength+3,3)).."Running")
         print(string.rep("-",longestLength+10))
         for i,v in pairs(TaskSchedular.tasks) do
             print(System.utility.padText(i,longestLength+3)..tostring(not v[4]))

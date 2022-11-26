@@ -5,11 +5,11 @@ local module = {}
     module.func = function (rawText) 
         local args = System.utility.getArgs(rawText)
         local path = System.utility.resolveFilePath(args[2] or "")
-        if BOOTDRIVEPROXY.exists(path) then
-            if BOOTDRIVEPROXY.isDirectory(path) then
-                print("Directory <"..path..">:")
-                for i,v in ipairs(BOOTDRIVEPROXY.list(path)) do
-                    if BOOTDRIVEPROXY.isDirectory(path.."/"..v) then
+        if WORKINGDRIVEPROXY.exists(path) then
+            if WORKINGDRIVEPROXY.isDirectory(path) then
+                print("Directory <"..System.utility.getPrefixWorkingDir()..path..">:")
+                for i,v in ipairs(WORKINGDRIVEPROXY.list(path)) do
+                    if WORKINGDRIVEPROXY.isDirectory(path.."/"..v) then
                         print("DIR   "..string.sub(v,1,#v-1))
                     else
                         print("FILE  "..v)

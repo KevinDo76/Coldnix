@@ -4,7 +4,7 @@ local module = {}
     module.description='execute an executable at <path>'
     module.func = function (rawText)
         local args=System.utility.getArgs(rawText)
-        local drive=BOOTDRIVEPROXY
+        local drive=WORKINGDRIVEPROXY
         if args[2]~=nil and args[2]~="" then
             args[2] = System.utility.resolveFilePath(args[2])
             if drive.exists(args[2]) and not drive.isDirectory(args[2]) then
@@ -25,12 +25,14 @@ local module = {}
                 end)
                 if not succ then
                     print("An unhandled error had occured: "..err)
+                else
+                    print('Executed "'..System.utility.getPrefixWorkingDir()..args[2]..'"')
                 end
             else
                 if drive.isDirectory(args[2]) then
                     print('"'..args[2]..'" is a directory')
                 else
-                    print('Unable to find an executable at "'..args[2]..'"')
+                    print('Unable to find an executable at "'..System.utility.getPrefixWorkingDir()..args[2]..'"')
                 end
             end
         else

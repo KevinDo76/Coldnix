@@ -24,6 +24,9 @@ local systemFiles={
 --getting the bootdrive
 _G.BOOTDRIVEADDRESS=computer.getBootAddress()
 _G.BOOTDRIVEPROXY=component.proxy(BOOTDRIVEADDRESS)
+_G.WORKINGDRIVEADDRESS=BOOTDRIVEADDRESS
+_G.WORKINGDRIVEPROXY=BOOTDRIVEPROXY
+_G.currentWorkingDir = "/Coldnix"
 --defining basic functions that's needed for the OS
     --adding component.avaliables to the OS because it's not included for reasons
     function component.avaliables(type)
@@ -75,15 +78,16 @@ _G.BOOTDRIVEPROXY=component.proxy(BOOTDRIVEADDRESS)
         end
     end
     --adding in loadfile()
-    _G.loadfile=function(filepath,errorOnFail)
+    _G.loadfile=function(filepath,errorOnFail,drive)
+        drive=drive or BOOTDRIVEPROXY
         if errorOnFail==nil then  errorOnFail=true end --if erroronfail is not set, set it to true
-        local file=BOOTDRIVEPROXY.open(filepath)
+        local file=drive.open(filepath)
         local finalEx=""
         repeat 
-            local currentLoad=BOOTDRIVEPROXY.read(file,math.huge)
+            local currentLoad=drive.read(file,math.huge)
             finalEx=finalEx..(currentLoad or "")
         until not currentLoad
-        BOOTDRIVEPROXY.close(file)
+        drive.close(file)
         return loadstring(finalEx,filepath,errorOnFail)
     end
 
@@ -129,7 +133,7 @@ for i,v in ipairs(systemFiles) do
         print("loaded file \"/"..v.."\"")
     end
 end
-
+computer.ElapseT=0
 print("done loading")
 --main loops for the computer that keeps it running and run other programs
 while true do

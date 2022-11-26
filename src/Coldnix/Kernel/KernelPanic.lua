@@ -62,7 +62,10 @@ function KernelPanic(err)
     end
     
     BOOTGPUPROXY.setForeground(0xffffff)
-    BOOTGPUPROXY.fill(1,1,rx,ry," ")
+    for i=1,ry do
+        BOOTGPUPROXY.fill(1,1,rx,i," ") 
+        ewait(0.01)
+    end
     --draw sadface
     BOOTGPUPROXY.setForeground(0xffffff)
     BOOTGPUPROXY.setBackground(0xffffff)
