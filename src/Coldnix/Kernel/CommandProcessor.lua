@@ -21,7 +21,7 @@ for i=1,#commandDirList do
     commandAPI.validCommands=validCommands
 end
 local function response(rawText)
-    if not commandAPI.noCommandProcess then
+    if not commandAPI.noCommandProcess and rawText~="^C" then
         local splitText=string.split(rawText," ")
         local commandName=splitText[1]
         if commandName~=nil then
@@ -40,5 +40,6 @@ local function response(rawText)
         end
     end
 end
-
-terminal.commandProcessor = response
+if terminal then
+    terminal.commandProcessor = response
+end

@@ -16,6 +16,7 @@ local systemFiles={
     "Coldnix/Kernel/EventManager.lua",
     "Coldnix/Kernel/Terminal.lua",
     "Coldnix/Kernel/CommandProcessor.lua",
+    "Coldnix/Kernel/TerminationGenerator.lua",
     "Coldnix/Kernel/systemStatus.lua",
     "Coldnix/Debug/KeyboardInputTest.lua",
     "Coldnix/Debug/GPUCommandLog.lua",
@@ -120,18 +121,18 @@ _G.BOOTGPUPROXY=component.proxy(BOOTGPUADDRESS)
 --launching other operating system system files
 for i,v in ipairs(systemFiles) do
     if Log then
-        Log.writeLog(string.format('loading file "%s"',v))
+        Log.writeLog(string.format('loading "%s"',v))
     end
     local suc,err=pcall(function() loadfile(v)() end)
     if not suc then
         KernelPanic(err)
     end
     if Log then
-        Log.writeLog(string.format('loaded file "%s"',v))
+        Log.writeLog(string.format('loaded "%s"',v))
     end
 
     if print then
-        print("loaded file \"/"..v.."\"")
+        print("loaded \"/"..v.."\"")
     end
 end
 computer.ElapseT=0

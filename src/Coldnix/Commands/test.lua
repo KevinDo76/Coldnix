@@ -4,7 +4,7 @@ local module = {}
     module.description="this is a test program, very nice"
     module.func = function (rawText)
         local count=2
-        while wait() do
+        while (wait()) do
             for i=1,count do
                 local a = 2
                 local b = 2

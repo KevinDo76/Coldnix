@@ -47,17 +47,26 @@ EventManager.onSignal = function (name,...)
 end
 
 --replacing the wait() function to call onSignal
-local start=computer.uptime()
+_G.yieldCheck={}
+yieldCheck.start=computer.uptime()
 _G.wait = function(time)
     local endTime=computer.uptime()+(time or 0.01)
-    computer.ElapseT=computer.uptime()-start
-    start=computer.uptime()
+    computer.ElapseT=computer.uptime()-yieldCheck.start
+    yieldCheck.start=computer.uptime()
     while computer.uptime()<endTime do
         EventManager.onSignal(computer.pullSignal(math.clamp(endTime-computer.uptime(),0,0.01)))
         TaskScheduler.runTask()
     end
     if computer.ElapseT>3 then
-        error("task termination")
+        error("program termination, too long no yield")
     end
     return true 
+end
+
+--check when was the last time wait() was ran. Meant to be inserted at the top of system api functions/print/etc. running wait() is important because it register all user input
+_G.CheckYield = function ()
+    computer.ElapseT=computer.uptime()-yieldCheck.start
+    if computer.ElapseT>3 then
+        error("program termination, too long no yield")
+    end
 end

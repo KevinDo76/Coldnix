@@ -12,12 +12,12 @@ BOOTGPUPROXY.setBackground(0x000000)
 BOOTGPUPROXY.setForeground(0xffffff)
 BOOTGPUPROXY.fill(1,1,x,y," ")
 _G.controlDown=false
-_G.exit=false
+_G.running=true
 --------------------------------
 local lastcx=1
 local lastcy=1
 local cx=1
-local cy=1
+local cy=0
 local cstate=true
 
 local renderx=0
@@ -39,11 +39,7 @@ end
 local lineChunk = parse(filetxt)--chopping the text file into lines stored in multiple index
 --event registering
 EventManager.regsisterListener("editdown","key_down",function(componentId,asciiNum,keyboardcode)
-    if keyboardcode==29 then
-        ControlDown=true
-    elseif keyboardcode==46 and ControlDown then
-        _G.exit=true 
-    elseif keyboardcode==208 then
+    if keyboardcode==208 then
         cy=math.clamp(cy+1,0,y-1-yoffset)
     elseif keyboardcode==200 then
         cy=math.clamp(cy-1,0,y-1-yoffset)
@@ -54,10 +50,8 @@ EventManager.regsisterListener("editdown","key_down",function(componentId,asciiN
     end
 end)
 
-EventManager.regsisterListener("editup","key_up",function(componentId,asciiNum,keyboardcode)
-    if keyboardcode==29 then
-        ControlDown=false
-    end
+EventManager.regsisterListener("editTermination","SIGTERM",function() 
+    _G.running=false
 end)
 
 local function render()
@@ -84,7 +78,7 @@ local function render()
     end
 end
 --main loop
-while not exit do
+while running do
     wait()
     render()
 end
@@ -92,3 +86,4 @@ EventManager.removeListener("editdown")
 EventManager.removeListener("editup")
 computer.beep(1000,0.1)
 terminal.resumeProcess()
+print("Closed")

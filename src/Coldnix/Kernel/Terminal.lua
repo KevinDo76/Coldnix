@@ -45,6 +45,7 @@ end
 --print specifically for re rendering the screen
 --global print
 _G.print = function(...)
+    CheckYield()
     local txt=""
     local args={...}
     if #args>0 then
@@ -54,7 +55,7 @@ _G.print = function(...)
     else
         txt="nil "
     end
-
+    while (string.find(txt,"\9")~=nil) do txt=string.gsub(txt,"\9","    ") end --replace all horizontal tab with spaces
     txt=string.sub(txt,1,#txt-1)
     local textChunk={}
     local finalChunk={}
@@ -151,6 +152,18 @@ terminal.stopProcess = function(clearScreen)
     if clearScreen then
         BOOTGPUPROXY.fill(terminal.x,terminal.y,terminal.width,terminal.height," ")
     end
+end
+
+terminal.getProcessState = function() 
+    return processing
+end
+
+terminal.PanicReset = function()
+    commandAPI.noCommandProcess=false
+    terminal.prefix=System.filesystem.getPrefixWorkingDir()..currentWorkingDir..": "
+    terminal.resumeProcess()
+    Log.writeLog(">>>Terminal panic reloaded<<<")
+    print(">>>Terminal panic reloaded<<<")
 end
 
 ----------------------------------
@@ -292,6 +305,10 @@ end
 --adding task
 TaskScheduler.addTask("CursorBlink",cursorBlink,0.2)
 --regsistering keyboard event
+EventManager.regsisterListener("TerminalInputTermination","SIGTERM",function() 
+    waitingForTextInput=false
+end)
+
 EventManager.regsisterListener("TerminalScroll","scroll",function(componentId,x,y,direction)
     if direction>0 then
         if pageScroll<#terminal.screenHistory-terminal.height+1+terminal.typeBarYOffset then

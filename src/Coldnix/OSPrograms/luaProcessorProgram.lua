@@ -2,31 +2,19 @@ print("starting ".._VERSION.." Terminal")
 commandAPI.noCommandProcess=true
 terminal.prefix=_VERSION..": "
 terminal.reload()
-_G.exit=false
-_G.ControlDown=false
-EventManager.regsisterListener("luainterdown","key_down",function(componentId,asciiNum,keyboardcode)
-    if keyboardcode==29 then
-        ControlDown=true
-    elseif keyboardcode==46 and ControlDown then
-        _G.exit=true 
-        terminal.type("^C")
-        terminal.enter()
-    end
-end)
-
-EventManager.regsisterListener("luainterup","key_up",function(componentId,asciiNum,keyboardcode)
-    if keyboardcode==29 then
-        ControlDown=false
-    end
-end)
+local running=true
 
 local function returnValue(value)
     if type(value)~="string" then
         return value
     end
-    local func,err = load("local a="..value.." return a","=Lua interpreter","t",_G)
+    local func = load("local a="..value.." return a","=Lua interpreter","t",_G)
     if func then
-        return func()
+        local succ, value = pcall(func)
+        if not succ then
+            value="nil"
+        end
+        return value
     else
         return "nil"
     end
@@ -49,13 +37,17 @@ local function listToString(obj,name,minimal)
         else
             str=name.."={"..str
         end
-        return string.sub(str,1,#str-1).."\n"..string.rep(" ",#name+2).."}"
+        return string.sub(str,1,#str-1).."\n}"
     else
         return obj
     end
 end
 
-while not exit do
+EventManager.regsisterListener("LuaTerminalTermination","SIGTERM",function() 
+    running=false
+end)
+
+while running do
     local inp=terminal.input(_VERSION..": ")
     if string.sub(inp,#inp-1,#inp)~="^C" then
         local func,err=load(inp,"=Lua interpreter","t",_G)
@@ -82,8 +74,6 @@ while not exit do
         else
             print(err)
         end
-    else
-        break
     end
 end
 print("Exiting ".._VERSION.." Terminal")
@@ -92,5 +82,4 @@ terminal.prefix=System.filesystem.getPrefixWorkingDir()..currentWorkingDir..": "
 terminal.reload()
 _G.exit=nil
 _G.ControlDown=nil
-EventManager.removeListener("luainterdown")
-EventManager.removeListener("luainterup")
+EventManager.removeListener("LuaTerminalTermination")
