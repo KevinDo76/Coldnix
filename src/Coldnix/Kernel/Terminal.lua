@@ -1,5 +1,5 @@
 --provide the basic terminal/commandlines
---the "terminal" is going to be resizeable and moveable to allow flexibility
+--the "terminal" is going to be resizeable and moveable to allow flexibility in the future?
 local rx,ry=BOOTGPUPROXY.getResolution()
 _G.terminal={}
 terminal.x=1
@@ -18,7 +18,7 @@ local moveDB=computer.uptime()
 local typeBuffer=""
 local typeHistory={}
 local typeHisIndex=1
-local maxHistorySize=terminal.height+50
+local maxHistorySize=terminal.height+200
 local lastoffset=0
 local pageScroll=0
 local waitingForTextInput=false
@@ -47,8 +47,12 @@ end
 _G.print = function(...)
     local txt=""
     local args={...}
-    for i,v in pairs(args) do
-        txt=txt..tostring(v).." "
+    if #args>0 then
+        for i,v in pairs(args) do
+            txt=txt..tostring(v).." "
+        end
+    else
+        txt="nil "
     end
 
     txt=string.sub(txt,1,#txt-1)
@@ -129,19 +133,21 @@ end
 
 terminal.resumeProcess = function()
     processing = true
-    TaskSchedular.resumeTask("StatusBarUpdate")
-    TaskSchedular.resumeTask("CursorBlink")
+    TaskScheduler.resumeTask("StatusBarUpdate")
+    TaskScheduler.resumeTask("CursorBlink")
     EventManager.resumeListener("TerminalInput")
     EventManager.resumeListener("TerminalClipboard")
+    EventManager.resumeListener("TerminalScroll")
     terminal.reload()
 end
 
 terminal.stopProcess = function(clearScreen)
     processing = false
-    TaskSchedular.pauseTask("StatusBarUpdate")
-    TaskSchedular.pauseTask("CursorBlink")
+    TaskScheduler.pauseTask("StatusBarUpdate")
+    TaskScheduler.pauseTask("CursorBlink")
     EventManager.pauseListener("TerminalInput")
     EventManager.pauseListener("TerminalClipboard")
+    EventManager.pauseListener("TerminalScroll")
     if clearScreen then
         BOOTGPUPROXY.fill(terminal.x,terminal.y,terminal.width,terminal.height," ")
     end
@@ -284,8 +290,22 @@ local function cursorBlink()
     end
 end
 --adding task
-TaskSchedular.addTask("CursorBlink",cursorBlink,0.2)
+TaskScheduler.addTask("CursorBlink",cursorBlink,0.2)
 --regsistering keyboard event
+EventManager.regsisterListener("TerminalScroll","scroll",function(componentId,x,y,direction)
+    if direction>0 then
+        if pageScroll<#terminal.screenHistory-terminal.height+1+terminal.typeBarYOffset then
+            pageScroll=pageScroll+1
+            terminal.reload()
+        end
+    else
+        if pageScroll>0 then
+            pageScroll=pageScroll-1
+            terminal.reload()
+        end
+    end
+end)
+
 EventManager.regsisterListener("TerminalInput","key_down",function(componentId,asciiNum,keyboardcode)
     if asciiNum>=32 and asciiNum<=126 then
         terminal.type(string.char(asciiNum))

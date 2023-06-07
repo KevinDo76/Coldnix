@@ -1,6 +1,7 @@
 --A custom "bluescreen" for the os
 --could be usefull fatal crash debugging
 function KernelPanic(err)
+    if err=="Coldnix/Kernel/EventManager.lua:60: task termination" then print("Task terminated") return end
     err=err or "No error message provided"
     pcall(function() Log.writeLog("\nUnhandled error: "..err.."\nfatal error") end)
     --local variables

@@ -8,10 +8,36 @@ STATUSBARUPDATERATE=0.25
 COMMANDSDIRECTORY=/OS/Commands
 MAXUSERTYPEHISTORY=25
 LOADCOMMANDCODEINTOMEM=1
-HELPCOMMANDPERPAGE=5]==]
+HELPCOMMANDPERPAGE=5
+OSDRIVENAMELENGTH=4]==]
+--simplefileoperation
+local writefile = function (path,data,drive)
+    drive = drive or BOOTDRIVEPROXY
+    if not drive.isReadOnly() then
+        local file=drive.open(path,"w")
+        return drive.write(file,data)
+    else
+        print("System File Operation Error, Drive is read only")
+    end
+end
+
+local readfile = function(path,driveproxy)
+    driveproxy=driveproxy or BOOTDRIVEPROXY
+    if driveproxy.exists(path) and not driveproxy.isDirectory(path) then
+        local file=driveproxy.open(path)
+        local finalEx=""
+        repeat 
+            local currentLoad=driveproxy.read(file,math.huge)
+            finalEx=finalEx..(currentLoad or "")
+        until not currentLoad
+        return finalEx,true
+    else
+        return "",false
+    end
+end
 --functions
 _G.config.reflashConfig = function ()
-    System.writefile(configLocation,defaultConfigFile)
+    writefile(configLocation,defaultConfigFile)
     for i=10,1,-1 do
         local x,y=BOOTGPUPROXY.getResolution()
         BOOTGPUPROXY.fill(1,1,x,y," ")
@@ -32,7 +58,7 @@ local function decodeConfig(rawConfig)
     return finalConfig
 end
 --loading the config file for processing
-local configFile,succ=System.readfile(configLocation)
+local configFile,succ=readfile(configLocation)
 if succ then
    _G.config.configList=decodeConfig(configFile)
    local corrupted=false

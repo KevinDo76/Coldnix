@@ -5,7 +5,7 @@ terminal.setSize(tx,ty+sizeOffset)
 local tx,ty=terminal.x,terminal.y
 terminal.setPosition(tx,ty-sizeOffset)
 --setting up status bar
-TaskSchedular.addTask("StatusBarUpdate",[==[
+TaskScheduler.addTask("StatusBarUpdate",[==[
 local x,y=BOOTGPUPROXY.getResolution()
 BOOTGPUPROXY.setBackground(0x000000)
 BOOTGPUPROXY.setForeground(0xffffff)

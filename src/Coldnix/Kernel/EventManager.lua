@@ -54,7 +54,10 @@ _G.wait = function(time)
     start=computer.uptime()
     while computer.uptime()<endTime do
         EventManager.onSignal(computer.pullSignal(math.clamp(endTime-computer.uptime(),0,0.01)))
-        TaskSchedular.runTask()
+        TaskScheduler.runTask()
     end
-    return true
+    if computer.ElapseT>3 then
+        error("task termination")
+    end
+    return true 
 end

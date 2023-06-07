@@ -8,19 +8,19 @@ end
 local requiredHardwares={"gpu","screen","keyboard"}
 local avaliableHardwaresFound={}
 local systemFiles={
-    "Coldnix/Kernel/System.lua",    
-    "Coldnix/Kernel/config.lua",
     "Coldnix/Kernel/KernelPanic.lua",
+    "Coldnix/Kernel/config.lua",
+    "Coldnix/Kernel/System.lua",    
     "Coldnix/Kernel/log.lua",
     "Coldnix/Kernel/TaskScheduler.lua",
     "Coldnix/Kernel/EventManager.lua",
     "Coldnix/Kernel/Terminal.lua",
-    "Coldnix/Debug/GPUCommandLog.lua",
-    "Coldnix/Kernel/systemStatus.lua",
     "Coldnix/Kernel/CommandProcessor.lua",
+    "Coldnix/Kernel/systemStatus.lua",
     "Coldnix/Debug/KeyboardInputTest.lua",
+    "Coldnix/Debug/GPUCommandLog.lua",
 }
-
+_G.print=function() end --placeholder for print, allowing the core OS to load without the terminal ontop
 --getting the bootdrive
 _G.BOOTDRIVEADDRESS=computer.getBootAddress()
 _G.BOOTDRIVEPROXY=component.proxy(BOOTDRIVEADDRESS)
@@ -105,13 +105,13 @@ for i,v in pairs(requiredHardwares) do
     avaliableHardwaresFound[v]=result
 end
 
---setting up the gpu and screens
+--setting up the gpu and screen
 _G.BOOTGPUADDRESS=avaliableHardwaresFound["gpu"]
 _G.BOOTGPUPROXY=component.proxy(BOOTGPUADDRESS)
     --binding the gpu to the screen
     local success,err=BOOTGPUPROXY.bind(avaliableHardwaresFound["screen"], true)
     if not success then
-        error("Failed to bind the gpu to the screen, error: "..err)
+        error("Failed to bind the primary gpu to a screen, error: "..err)
     end
     --clearing the screen
     local rx,ry=BOOTGPUPROXY.getResolution()
@@ -135,7 +135,7 @@ for i,v in ipairs(systemFiles) do
     end
 end
 computer.ElapseT=0
-print("done loading")
+print("Done!")
 --main loops for the computer that keeps it running and run other programs
 while true do
     local s,e = pcall(function ()

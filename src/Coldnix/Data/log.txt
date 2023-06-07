@@ -8,15 +8,12 @@ loading file "Coldnix/Kernel/EventManager.lua"
 loaded file "Coldnix/Kernel/EventManager.lua"
 loading file "Coldnix/Kernel/Terminal.lua"
 Added task id: "CursorBlink", with interval: 0.2 sec
+New event registered, name: "TerminalScroll" for event: "scroll"
 New event registered, name: "TerminalInput" for event: "key_down"
 New event registered, name: "TerminalClipboard" for event: "clipboard"
 loaded file "Coldnix/Kernel/Terminal.lua"
-loading file "Coldnix/Debug/GPUCommandLog.lua"
-loaded file "Coldnix/Debug/GPUCommandLog.lua"
-loading file "Coldnix/Kernel/systemStatus.lua"
-Added task id: "StatusBarUpdate", with interval: 0.25 sec
-loaded file "Coldnix/Kernel/systemStatus.lua"
 loading file "Coldnix/Kernel/CommandProcessor.lua"
+Valid command: disk
 Valid command: clr
 Valid command: cd
 Valid command: help
@@ -27,5 +24,12 @@ Valid command: ls
 Valid command: exc
 Valid command: test
 loaded file "Coldnix/Kernel/CommandProcessor.lua"
+loading file "Coldnix/Kernel/systemStatus.lua"
+Added task id: "StatusBarUpdate", with interval: 0.25 sec
+loaded file "Coldnix/Kernel/systemStatus.lua"
 loading file "Coldnix/Debug/KeyboardInputTest.lua"
 loaded file "Coldnix/Debug/KeyboardInputTest.lua"
+loading file "Coldnix/Debug/GPUCommandLog.lua"
+loaded file "Coldnix/Debug/GPUCommandLog.lua"
+New event registered, name: "luainterdown" for event: "key_down"
+New event registered, name: "luainterup" for event: "key_up"
