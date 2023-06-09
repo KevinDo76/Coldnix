@@ -2,8 +2,9 @@
 --could be usefull fatal crash debugging
 function KernelPanic(err)
     --safe panic check
-    if string.find(err,"program termination, too long no yield") then computer.ElapseT=0 yieldCheck.start=computer.uptime() Log.writeLog("Program terminated, too long without yield") print(">>>Program terminated, too long without yield<<<") terminal.PanicReset() return end
-    if err=="too long without yielding" then computer.ElapseT=0 yieldCheck.start=computer.uptime() Log.writeLog("Program terminated, too long without yield") print(">>>Program terminated, too long without yield<<<") terminal.PanicReset() return end
+    if string.find(err,"Keyboard termination") then terminal.PanicReset(1) return end
+    if string.find(err,"program termination, too long no yield") then computer.ElapseT=0 yieldCheck.start=computer.uptime() Log.writeLog("Program terminated, too long without yield") print(">>>Program terminated, too long without yield<<<") terminal.PanicReset(0) return end
+    if err=="too long without yielding" then computer.ElapseT=0 yieldCheck.start=computer.uptime() Log.writeLog("Program terminated, too long without yield") print(">>>Program terminated, too long without yield<<<") terminal.PanicReset(0) return end
     --not safe beyond here
     err=err or "No error message provided"
     pcall(function() Log.writeLog("\nUnhandled error: "..err.."\nfatal error") end)

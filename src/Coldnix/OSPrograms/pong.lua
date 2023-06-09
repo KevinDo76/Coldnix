@@ -14,9 +14,12 @@ local accerelation=1
 --game state
 local running=true
 local gameStage="main"
-local velocityDir=0
 local pad1y=1
 local pad1vel=0
+local ballX=math.floor(x/2)
+local ballY=math.floor(y/2)
+local ballVelX=1
+local ballVelY=1
 local keyStatus={
     up=false,
     down=false
@@ -57,10 +60,42 @@ while running do
         end
         gpu.setBackground(0x000000)
         gpu.setForeground(0x000000)
+        gpu.set(ballX,ballY," ")
         gpu.fill(1,pad1y,1,padSize," ")
-        pad1y=math.clamp(pad1y+pad1vel,1,y-padSize)
+
+        --update 
+        pad1y=math.clamp(pad1y+pad1vel,1,y-padSize+1)
+
+        ballX=ballX+ballVelX
+        ballY=ballY-ballVelY
+
+        if ballX<=2 then
+            if ballY-pad1y>=0 and ballY-pad1y<=5 then
+                --ballVelX=ballVelX*-1 
+                local angle=math.random(-5,5)
+                ballVelX=math.cos(math.rad(angle))
+                ballVelY=math.sin(math.rad(angle))
+            else
+                ballX=math.floor(x/2)
+                ballY=math.floor(y/2)
+            end
+        end
+
+        if ballY<=1 then
+            ballVelY=ballVelY*-1
+        end
+
+        if ballY>=y then
+            ballVelY=ballVelY*-1
+        end
+
+        if ballX>=x then
+            ballVelX=ballVelX*-1
+        end
+
         gpu.setBackground(0xffffff)
         gpu.setForeground(0xffffff)
+        gpu.set(ballX,ballY," ")
         gpu.fill(1,pad1y,1,padSize," ")
     end
 end

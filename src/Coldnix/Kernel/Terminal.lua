@@ -22,6 +22,9 @@ local maxHistorySize=terminal.height+200
 local lastoffset=0
 local pageScroll=0
 local waitingForTextInput=false
+--clearScreen
+local rx,ry=BOOTGPUPROXY.getResolution()
+BOOTGPUPROXY.fill(1,1,rx,ry," ")
 --spacePadding to fill in the rest of the empty space with text to makes sure it overwrite the last line
 terminal.padText = function(text,length)
     while #text<length do
@@ -158,12 +161,16 @@ terminal.getProcessState = function()
     return processing
 end
 
-terminal.PanicReset = function()
+terminal.PanicReset = function(class)
     commandAPI.noCommandProcess=false
     terminal.prefix=System.filesystem.getPrefixWorkingDir()..currentWorkingDir..": "
     terminal.resumeProcess()
-    Log.writeLog(">>>Terminal panic reloaded<<<")
-    print(">>>Terminal panic reloaded<<<")
+    if class==0 then
+        Log.writeLog(">>>Terminal panic reloaded<<<")
+        print(">>>Terminal panic reloaded<<<")
+    elseif class==1 then
+        print(">>>Task force terminated<<<")
+    end
 end
 
 ----------------------------------
@@ -306,6 +313,10 @@ end
 TaskScheduler.addTask("CursorBlink",cursorBlink,0.2)
 --regsistering keyboard event
 EventManager.regsisterListener("TerminalInputTermination","SIGTERM",function() 
+    waitingForTextInput=false
+end)
+
+EventManager.regsisterListener("TerminalInputForceTermination","SIGKILL",function() 
     waitingForTextInput=false
 end)
 

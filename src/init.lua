@@ -21,7 +21,7 @@ local systemFiles={
     "Coldnix/Debug/KeyboardInputTest.lua",
     "Coldnix/Debug/GPUCommandLog.lua",
 }
-_G.print=function() end --placeholder for print, allowing the core OS to load without the terminal ontop
+
 --getting the bootdrive
 _G.BOOTDRIVEADDRESS=computer.getBootAddress()
 _G.BOOTDRIVEPROXY=component.proxy(BOOTDRIVEADDRESS)
@@ -118,7 +118,11 @@ _G.BOOTGPUPROXY=component.proxy(BOOTGPUADDRESS)
     local rx,ry=BOOTGPUPROXY.getResolution()
     BOOTGPUPROXY.fill(1,1,rx,ry," ")
 
+--placeholder for print, allowing the core OS to load without the terminal ontop
+local tempLcount=1
+_G.print=function(text) BOOTGPUPROXY.set(1,tempLcount,text) tempLcount=tempLcount+1 end
 --launching other operating system system files
+print("Coldnix Kernel is starting")
 for i,v in ipairs(systemFiles) do
     if Log then
         Log.writeLog(string.format('loading "%s"',v))

@@ -7,6 +7,12 @@ EventManager.regsisterListener("TerminationGeneratorDown","key_down",function(co
             terminal.type("^C")
             terminal.enter()
         end
+    elseif ControlDown and keyboardcode==45 then
+        computer.pushSignal("SIGKILL")
+        if terminal and terminal.getProcessState() then
+            terminal.type("^X")
+            terminal.enter()
+        end
     end
 end)
 

@@ -37,6 +37,9 @@ EventManager.removeListener = function (eventName)
 end
 --this would be place into the wait() function since it's the only place that will ever call on eventpull
 EventManager.onSignal = function (name,...)
+    if name=="SIGKILL" then
+        error("Keyboard termination")
+    end
     if name~=nil then
         for i,v in pairs(EventManager.eventsList) do
             if v[1]==name and v[3] then
@@ -52,14 +55,14 @@ yieldCheck.start=computer.uptime()
 _G.wait = function(time)
     local endTime=computer.uptime()+(time or 0.01)
     computer.ElapseT=computer.uptime()-yieldCheck.start
-    yieldCheck.start=computer.uptime()
+    if computer.ElapseT>3 then
+        error("program termination, too long no yield")
+    end
     while computer.uptime()<endTime do
         EventManager.onSignal(computer.pullSignal(math.clamp(endTime-computer.uptime(),0,0.01)))
         TaskScheduler.runTask()
     end
-    if computer.ElapseT>3 then
-        error("program termination, too long no yield")
-    end
+    yieldCheck.start=computer.uptime()
     return true 
 end
 

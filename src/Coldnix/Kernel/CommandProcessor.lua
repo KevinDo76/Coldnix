@@ -14,6 +14,7 @@ for i=1,#commandDirList do
         else
             validCommands[file.name]={file.name,file.description,commandDirList[i],file.id}
         end
+        print("loaded \""..commandDir.."/"..file.name.."\"")
     else
         print("failed to load "..commandDir.."/"..commandDirList[i])
         Log.writeLog("failed to load "..commandDir.."/"..commandDirList[i])
@@ -21,7 +22,7 @@ for i=1,#commandDirList do
     commandAPI.validCommands=validCommands
 end
 local function response(rawText)
-    if not commandAPI.noCommandProcess and rawText~="^C" then
+    if not commandAPI.noCommandProcess and rawText~="^C" and rawText~="^X" then
         local splitText=string.split(rawText," ")
         local commandName=splitText[1]
         if commandName~=nil then
