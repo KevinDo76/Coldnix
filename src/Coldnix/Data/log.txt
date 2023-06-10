@@ -18,6 +18,7 @@ loading "Coldnix/Kernel/CommandProcessor.lua"
 Valid command: disk
 Valid command: clr
 Valid command: cd
+Valid command: restart
 Valid command: help
 Valid command: pong
 Valid command: lua
