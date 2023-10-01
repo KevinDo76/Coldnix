@@ -28,6 +28,18 @@ _G.BOOTDRIVEPROXY=component.proxy(BOOTDRIVEADDRESS)
 _G.WORKINGDRIVEADDRESS=BOOTDRIVEADDRESS
 _G.WORKINGDRIVEPROXY=BOOTDRIVEPROXY
 _G.currentWorkingDir = "/Coldnix"
+SandBox = {}
+ExecutionEnv = _G
+
+local updateExeEnv = function()
+    for i,v in pairs(_G) do
+        if i~="_G" and i~="SandBox" and i~="ExecutionEnv" and not SandBox[i] then
+            SandBox[i] = _G[i]
+        end
+    end
+    SandBox._G = SandBox
+end
+
 --defining basic functions that's needed for the OS
     --adding component.avaliables to the OS because it's not included for reasons
     function component.avaliables(type)
@@ -68,7 +80,7 @@ _G.currentWorkingDir = "/Coldnix"
     --adding in loadstring, practically the most important function for the OS
     _G.loadstring=function (str,envname,errorOnFail)
         envname=envname or "loadstring_env"
-        local func,errorm=load(str,"="..envname,"bt",_G)
+        local func,errorm=load(str,"="..envname,"bt",ExecutionEnv)
         if func then
             return func
         else
@@ -92,7 +104,6 @@ _G.currentWorkingDir = "/Coldnix"
         drive.close(file)
         return loadstring(finalEx,filepath,errorOnFail)
     end
-
 --checking for hardware requirement
 for i,v in pairs(requiredHardwares) do
     local result=component.avaliables(v)
@@ -123,6 +134,7 @@ local tempLcount=1
 _G.print=function(text) BOOTGPUPROXY.set(1,tempLcount,text) tempLcount=tempLcount+1 end
 --launching other operating system system files
 print("Coldnix Kernel is starting")
+
 for i,v in ipairs(systemFiles) do
     if Log then
         Log.writeLog(string.format('loading "%s"',v))
@@ -140,12 +152,36 @@ for i,v in ipairs(systemFiles) do
     end
 end
 computer.ElapseT=0
+_G.getExecutionEnvType = function () return "kernel" end
+--SandBox Environment Creation
+updateExeEnv()
+
+SandBox.computer = {}
+for i,v in pairs(_G.computer) do
+    if i~="pullSignal" then
+        SandBox.computer[i] = v
+    end
+end
+
+SandBox.ChangeEnv=false
+SandBox.getExecutionEnvType = function () return "application" end
+
+ExecutionEnv = SandBox
+print("CHANGED EXECUTION ENVIRONMENT INTO PULLSIGNAL PROTECTED MODE")
+
+--Finished boot sequence
 print("Done!")
 --main loops for the computer that keeps it running and run other programs
+
 while true do
     local s,e = pcall(function ()
         wait(0.01)
     end)
+    if SandBox.ChangeEnv then
+        ExecutionEnv = _G
+        SandBox.ChangeEnv = false
+        print("Changed Env")
+    end
     if not s then
         KernelPanic(e)
     end

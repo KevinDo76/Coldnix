@@ -51,21 +51,25 @@ while running do
     local inp=terminal.input(_VERSION..": ")
     if string.sub(inp,#inp-1,#inp)~="^C" then
         local func,err=load(inp,"=Lua interpreter","t",_G)
+        local func2,err2=load("return "..inp,"=Lua interpreter","t",_G)
         --checking for single value request
         local split=string.split(inp," ")
-        local single=false
-        for i,v in pairs(split) do
-            if #v>0 and not single then
-                single=true
+
+        if #split==1 then
+            if err then
+                print(listToString(returnValue(inp),inp))
+                func = function() end
             else
-                single=false
-                break
+                if func2 then
+                    _G.returnV = nil
+                    pcall(function() _G.returnV = func2() end)
+                    if _G.returnV then print(_G.returnV) end
+                    _G.returnV = nil
+                end
             end
         end
-        if single and err then
-            print(listToString(returnValue(inp),inp))
-            func = function() end
-        end
+        
+        func2 = function() end
         if func then
             local succ,err=pcall(function() func() end)
             if not succ then
