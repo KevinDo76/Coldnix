@@ -1,6 +1,7 @@
 --A custom "bluescreen" for the os
 --could be usefull fatal crash debugging
-function KernelPanic(err)
+function KernelPanic(err, tracebackErr)
+    tracebackErr = tracebackErr or "no stack traceback:"
     --safe panic check
     if string.find(err,"Keyboard termination") then terminal.PanicReset(1) return end
     if string.find(err,"program termination, too long no yield") then computer.ElapseT=0 yieldCheck.start=computer.uptime() Log.writeLog("Program terminated, too long without yield") print(">>>Program terminated, too long without yield<<<") terminal.PanicReset(0) return end
@@ -14,14 +15,23 @@ function KernelPanic(err)
 
     local txtChunk={}
     local width=rx-6
-    err="An unhandled error had occured\nError Message: "..err.."\n \nSystem Memory at crash: "..tostring(computer.freeMemory()/1024).."kb".."\nPress any key to restart"
+    local startScrollCount = ry - 9
+    local printEnded=false
+    err="\nAN UNHANDLED ERROR HAS OCCURED\n \n"..tracebackErr.."\nend of stack traceback\n \nError Message: "..err.."\n \nSystem memory at crash: "..tostring(computer.freeMemory()/1024).."kb".."\nPress enter to restart\n  "
     --local functions
+
+    local padText = function (txt,length)
+        while (#txt<length) do
+            txt=txt.." "
+        end
+        return txt
+    end
 
     local function ewait(sec)
         local endTime=computer.uptime()+sec
         while computer.uptime()<endTime do
-            local name=computer.pullSignal(endTime-computer.uptime())
-            if name=="key_down" then
+            local name, componentId,asciiNum,keyboardcode=computer.pullSignal(endTime-computer.uptime())
+            if name=="key_down" and keyboardcode==28 and printEnded then
                 BOOTGPUPROXY.fill(1,1,rx,ry," ")
                 BOOTGPUPROXY.set(4,1,"restart in 1 second")
                 local restartTime=computer.uptime()+1
@@ -119,9 +129,14 @@ function KernelPanic(err)
     
     BOOTGPUPROXY.setForeground(0xffffff)
     for i,v in ipairs(finaChunk) do
+        if i > startScrollCount then
+            BOOTGPUPROXY.copy(1,2,rx ,ry,0,-1)
+            BOOTGPUPROXY.set(0,ry,padText("",rx))
+        end
+        BOOTGPUPROXY.set(4,math.min(i+9,ry),padText(v,rx-4))
         ewait(0.1)
-        BOOTGPUPROXY.set(4,i+9,v)
     end
+    printEnded = true
     while true do
         ewait(0.05)
         computer.beep(1000,0.1)

@@ -42,6 +42,7 @@ end
 --more advance version of string.split, this can handle text in "" for aurgments with spaces
 System.utility.getArgs = function (txt)
     txt=txt or ""
+    --remove spaces at the end
     while (txt:sub(#txt,#txt)==" ") do txt = txt:sub(1,#txt-1) end
     local dataChunk={}
     local tempChunk=""
@@ -51,8 +52,9 @@ System.utility.getArgs = function (txt)
         if string.sub(txt,rDex,rDex)=='"' then
             inQuote=not inQuote
             if not inQuote then
-                dataChunk[#dataChunk+1] = tempChunk
-                tempChunk=""
+                --possibly unnecessary
+                --dataChunk[#dataChunk+1] = tempChunk
+                --tempChunk=""
             end
         elseif string.sub(txt,rDex,rDex)==" " then
             if not inQuote then
@@ -117,7 +119,19 @@ System.filesystem.sanitizePath = function (path)
     local driveAddress = WORKINGDRIVEADDRESS
     local validAddress=true
     local reconstruct="/"
+    local tempPathComp = {}
+    --move to parent directory implentation
+    for i,v in ipairs(pathComp) do
+        if v == ".." then
+            tempPathComp[#tempPathComp ] = nil
+        else
+            tempPathComp[#tempPathComp + 1] = v
+        end
+    end
+
+    pathComp = tempPathComp
     pathComp[1] = pathComp[1] or ""
+
     if pathComp[1]:find(":") then
         includeDriveChange = true
         pathComp[1] = string.sub(pathComp[1],1,#pathComp[1]-1)
@@ -146,6 +160,7 @@ System.filesystem.sanitizePath = function (path)
     if validAddress then path="" end
     if includeDriveChange and validAddress then path="/"..string.sub(driveAddress or "",1,driveAddressLength)..":" end
     if validAddress then path=path..((reconstruct=="/" and includeDriveChange and "") or reconstruct) end
+
     return path
 end
 

@@ -7,19 +7,21 @@ end
 --starting settings
 local requiredHardwares={"gpu","screen","keyboard"}
 local avaliableHardwaresFound={}
+--all functions in these will always run under kernel environment
+--only newly compiled and executed codes are run under application environment unless they're escalated
 local systemFiles={
-    "Coldnix/Kernel/KernelPanic.lua",
-    "Coldnix/Kernel/config.lua",
-    "Coldnix/Kernel/System.lua",    
-    "Coldnix/Kernel/log.lua",
-    "Coldnix/Kernel/TaskScheduler.lua",
-    "Coldnix/Kernel/EventManager.lua",
-    "Coldnix/Kernel/Terminal.lua",
-    "Coldnix/Kernel/CommandProcessor.lua",
-    "Coldnix/Kernel/TerminationGenerator.lua",
-    "Coldnix/Kernel/systemStatus.lua",
-    "Coldnix/Debug/KeyboardInputTest.lua",
-    "Coldnix/Debug/GPUCommandLog.lua",
+    "/Coldnix/Kernel/KernelPanic.lua",
+    "/Coldnix/Kernel/config.lua",
+    "/Coldnix/Kernel/System.lua",    
+    "/Coldnix/Kernel/log.lua",
+    "/Coldnix/Kernel/TaskScheduler.lua",
+    "/Coldnix/Kernel/EventManager.lua",
+    "/Coldnix/Kernel/Terminal.lua",
+    "/Coldnix/Kernel/CommandProcessor.lua",
+    "/Coldnix/Kernel/TerminationGenerator.lua",
+    "/Coldnix/Kernel/systemStatus.lua",
+    "/Coldnix/Debug/KeyboardInputTest.lua",
+    "/Coldnix/Debug/GPUCommandLog.lua",
 }
 
 --getting the bootdrive
@@ -33,7 +35,7 @@ ExecutionEnv = _G
 
 local updateExeEnv = function()
     for i,v in pairs(_G) do
-        if i~="_G" and i~="SandBox" and i~="ExecutionEnv" and not SandBox[i] then
+        if i~="_G" and i~="SandBox" and i~="ExecutionEnv" and i~="getExecutionEnvType" and not SandBox[i] then
             SandBox[i] = _G[i]
         end
     end
@@ -78,9 +80,10 @@ end
         return true
     end
     --adding in loadstring, practically the most important function for the OS
-    _G.loadstring=function (str,envname,errorOnFail)
+    _G.loadstring=function (str,envname,errorOnFail,envType)
         envname=envname or "loadstring_env"
-        local func,errorm=load(str,"="..envname,"bt",ExecutionEnv)
+        envType=envType or _G
+        local func,errorm=load(str,"="..envname,"bt",envType)
         if func then
             return func
         else
@@ -92,8 +95,9 @@ end
         end
     end
     --adding in loadfile()
-    _G.loadfile=function(filepath,errorOnFail,drive)
+    _G.loadfile=function(filepath,errorOnFail,drive,envType)
         drive=drive or BOOTDRIVEPROXY
+        envType=envType or _G
         if errorOnFail==nil then  errorOnFail=true end --if erroronfail is not set, set it to true
         local file=drive.open(filepath)
         local finalEx=""
@@ -102,7 +106,7 @@ end
             finalEx=finalEx..(currentLoad or "")
         until not currentLoad
         drive.close(file)
-        return loadstring(finalEx,filepath,errorOnFail)
+        return loadstring(finalEx,filepath,errorOnFail,envType)
     end
 --checking for hardware requirement
 for i,v in pairs(requiredHardwares) do
@@ -129,12 +133,27 @@ _G.BOOTGPUPROXY=component.proxy(BOOTGPUADDRESS)
     local rx,ry=BOOTGPUPROXY.getResolution()
     BOOTGPUPROXY.fill(1,1,rx,ry," ")
 
+--SandBox Environment Creation
+updateExeEnv()
+
+SandBox.computer = {}
+for i,v in pairs(_G.computer) do
+    if i~="pullSignal" then
+        SandBox.computer[i] = v
+    end
+end
+
+SandBox.ChangeEnv=false
+SandBox.getExecutionEnvType = function () return "application" end
+SandBox.loadstring = function(str,envname,errorOnFail) return loadstring(str,envname,errorOnFail,SandBox) end
+SandBox.loadfile = function(filepath,errorOnFail,drive) return loadfile(filepath,errorOnFail,drive,SandBox) end
 --placeholder for print, allowing the core OS to load without the terminal ontop
 local tempLcount=1
 _G.print=function(text) BOOTGPUPROXY.set(1,tempLcount,text) tempLcount=tempLcount+1 end
 --launching other operating system system files
 print("Coldnix Kernel is starting")
-
+_G.getExecutionEnvType = function () return "kernel" end
+--executing system executables
 for i,v in ipairs(systemFiles) do
     if Log then
         Log.writeLog(string.format('loading "%s"',v))
@@ -148,32 +167,23 @@ for i,v in ipairs(systemFiles) do
     end
 
     if print then
-        print("loaded \"/"..v.."\"")
+        print("[  " .. string.format( "%.2f", tostring (computer.uptime())) .."s  ] loaded \""..v.."\"")
     end
+    updateExeEnv()
+    
 end
+yieldCheck.start = computer.uptime()
 computer.ElapseT=0
-_G.getExecutionEnvType = function () return "kernel" end
---SandBox Environment Creation
-updateExeEnv()
-
-SandBox.computer = {}
-for i,v in pairs(_G.computer) do
-    if i~="pullSignal" then
-        SandBox.computer[i] = v
-    end
-end
-
-SandBox.ChangeEnv=false
-SandBox.getExecutionEnvType = function () return "application" end
-
 ExecutionEnv = SandBox
+SandBox.print=print
 print("CHANGED EXECUTION ENVIRONMENT INTO PULLSIGNAL PROTECTED MODE")
 
 --Finished boot sequence
-print("Done!")
+print("Done! Coldnix kernel loaded")
 --main loops for the computer that keeps it running and run other programs
 
-while true do
+while true do 
+    _G.currentTraceback = ""
     local s,e = pcall(function ()
         wait(0.01)
     end)
@@ -183,6 +193,7 @@ while true do
         print("Changed Env")
     end
     if not s then
-        KernelPanic(e)
+
+        KernelPanic(e,currentTraceback)
     end
 end

@@ -163,6 +163,7 @@ end
 
 terminal.PanicReset = function(class)
     commandAPI.noCommandProcess=false
+    waitingForTextInput = false
     terminal.prefix=System.filesystem.getPrefixWorkingDir()..currentWorkingDir..": "
     terminal.resumeProcess()
     if class==0 then
@@ -408,6 +409,13 @@ EventManager.regsisterListener("TerminalInput","key_down",function(componentId,a
             terminal.reload()
         end
     end
+
+    if keyboardcode==15 then
+        local commandChunk = System.utility.getArgs(typeBuffer)
+        local attemptLookUpChunk = commandChunk[#commandChunk]
+
+        --local driveAddress,filepath,driveSearchSucc,drivelookup = System.filesystem.resolveDriveLookup()
+    end
 end)
 
 EventManager.regsisterListener("TerminalClipboard","clipboard", function(_,text) 
@@ -416,3 +424,8 @@ end)
 --final init 
 terminal.updateTypeBar()
 terminal.updateCursor()
+print("Boot Terminal Removed")
+print("Main Terminal Started")
+
+--terminal.setPosition(1,10)
+--terminal.setSize(80,7)

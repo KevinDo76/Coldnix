@@ -1,20 +1,20 @@
 
 ---------------------------------------------------
 Log started
-loaded "Coldnix/Kernel/log.lua"
-loading "Coldnix/Kernel/TaskScheduler.lua"
-loaded "Coldnix/Kernel/TaskScheduler.lua"
-loading "Coldnix/Kernel/EventManager.lua"
-loaded "Coldnix/Kernel/EventManager.lua"
-loading "Coldnix/Kernel/Terminal.lua"
+loaded "/Coldnix/Kernel/log.lua"
+loading "/Coldnix/Kernel/TaskScheduler.lua"
+loaded "/Coldnix/Kernel/TaskScheduler.lua"
+loading "/Coldnix/Kernel/EventManager.lua"
+loaded "/Coldnix/Kernel/EventManager.lua"
+loading "/Coldnix/Kernel/Terminal.lua"
 Added task id: "CursorBlink", with interval: 0.2 sec
 New event registered, name: "TerminalInputTermination" for event: "SIGTERM"
 New event registered, name: "TerminalInputForceTermination" for event: "SIGKILL"
 New event registered, name: "TerminalScroll" for event: "scroll"
 New event registered, name: "TerminalInput" for event: "key_down"
 New event registered, name: "TerminalClipboard" for event: "clipboard"
-loaded "Coldnix/Kernel/Terminal.lua"
-loading "Coldnix/Kernel/CommandProcessor.lua"
+loaded "/Coldnix/Kernel/Terminal.lua"
+loading "/Coldnix/Kernel/CommandProcessor.lua"
 Valid command: disk
 Valid command: clr
 Valid command: cd
@@ -27,15 +27,16 @@ Valid command: edit
 Valid command: ls
 Valid command: exc
 Valid command: test
-loaded "Coldnix/Kernel/CommandProcessor.lua"
-loading "Coldnix/Kernel/TerminationGenerator.lua"
+loaded "/Coldnix/Kernel/CommandProcessor.lua"
+loading "/Coldnix/Kernel/TerminationGenerator.lua"
 New event registered, name: "TerminationGeneratorDown" for event: "key_down"
 New event registered, name: "TerminationGeneratorUp" for event: "key_up"
-loaded "Coldnix/Kernel/TerminationGenerator.lua"
-loading "Coldnix/Kernel/systemStatus.lua"
+loaded "/Coldnix/Kernel/TerminationGenerator.lua"
+loading "/Coldnix/Kernel/systemStatus.lua"
 Added task id: "StatusBarUpdate", with interval: 0.25 sec
-loaded "Coldnix/Kernel/systemStatus.lua"
-loading "Coldnix/Debug/KeyboardInputTest.lua"
-loaded "Coldnix/Debug/KeyboardInputTest.lua"
-loading "Coldnix/Debug/GPUCommandLog.lua"
-loaded "Coldnix/Debug/GPUCommandLog.lua"
+loaded "/Coldnix/Kernel/systemStatus.lua"
+loading "/Coldnix/Debug/KeyboardInputTest.lua"
+loaded "/Coldnix/Debug/KeyboardInputTest.lua"
+loading "/Coldnix/Debug/GPUCommandLog.lua"
+loaded "/Coldnix/Debug/GPUCommandLog.lua"
+New event registered, name: "LuaTerminalTermination" for event: "SIGTERM"

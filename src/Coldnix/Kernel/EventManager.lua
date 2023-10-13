@@ -4,7 +4,7 @@ _G.EventManager = {}
 EventManager.eventsList={}
 EventManager.regsisterListener = function (eventName,listeningEventName,func)
     if type(func)=="function" then
-        --listen for name, func, is running
+        --listen for {name, func, is running}
         EventManager.eventsList[eventName]={listeningEventName,func,true}
         Log.writeLog(string.format('New event registered, name: "%s" for event: "%s"',eventName,listeningEventName))
     end
@@ -38,6 +38,7 @@ end
 --this would be place into the wait() function since it's the only place that will ever call on eventpull
 EventManager.onSignal = function (name,...)
     if name=="SIGKILL" then
+        print(debug.traceback())
         error("Keyboard termination")
     end
     if name~=nil then
@@ -53,9 +54,11 @@ end
 _G.yieldCheck={}
 yieldCheck.start=computer.uptime()
 _G.wait = function(time)
+    _G.currentTraceback = debug.traceback()
     local endTime=computer.uptime()+(time or 0.01)
     computer.ElapseT=computer.uptime()-yieldCheck.start
     if computer.ElapseT>3 then
+        print(debug.traceback())
         error("program termination, too long no yield")
     end
     while computer.uptime()<endTime do
@@ -70,6 +73,9 @@ end
 _G.CheckYield = function ()
     computer.ElapseT=computer.uptime()-yieldCheck.start
     if computer.ElapseT>3 then
+        --preventing recursive loop
+        yieldCheck.start = computer.uptime()
+        print(debug.traceback())
         error("program termination, too long no yield")
     end
 end

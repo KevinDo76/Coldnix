@@ -5,8 +5,10 @@ local commandDir="/Coldnix/Commands"
 local keepinmem=tonumber(config.configList.LOADCOMMANDCODEINTOMEM)
 local commandDirList=BOOTDRIVEPROXY.list(commandDir) or {}
 local validCommands={}
+local exeEnv = _G 
+if config.configList.LOADCOMMANDSASKERNEL == "0" then exeEnv=SandBox end
 for i=1,#commandDirList do
-    local file=loadfile(commandDir.."/"..commandDirList[i])()
+    local file=loadfile(commandDir.."/"..commandDirList[i],true,BOOTDRIVEPROXY,exeEnv)()
     if file.name and file.description and file.name and file.id then
         Log.writeLog("Valid command: "..file.name)
         if keepinmem==1 then
@@ -14,7 +16,7 @@ for i=1,#commandDirList do
         else
             validCommands[file.name]={file.name,file.description,commandDirList[i],file.id}
         end
-        print("loaded \""..commandDir.."/"..file.name.."\"")
+        print("[  " .. string.format( "%.2f", tostring (computer.uptime())) .."s  ] loaded \""..commandDir.."/"..commandDirList[i].."\"")
     else
         print("failed to load "..commandDir.."/"..commandDirList[i])
         Log.writeLog("failed to load "..commandDir.."/"..commandDirList[i])
@@ -29,14 +31,16 @@ local function response(rawText)
             print(string.rep("^",math.min(#rawText+#terminal.prefix,terminal.width)))
             if validCommands[commandName] then
                 if keepinmem==1 then
+                    _G.currentTraceback = debug.traceback()
                     validCommands[commandName][3].func(rawText)
                 else
                     local metadata=validCommands[commandName]
-                    local file=loadfile(commandDir.."/"..metadata[3])()
+                    local file=loadfile(commandDir.."/"..metadata[3],true,BOOTDRIVEPROXY,exeEnv)()
+                    _G.currentTraceback = debug.traceback()
                     file.func(rawText)
                 end
             else 
-                print('Unknown command "'..commandName..'", use "help" for a list of avaliable commands')
+                print("Unknown command \""..commandName.."\", use \"help\" for a list of avaliable commands")
             end
         end
     end
