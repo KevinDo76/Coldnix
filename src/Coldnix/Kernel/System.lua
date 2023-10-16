@@ -9,11 +9,12 @@ System.writefile=function (path,data,drive)
         local file=drive.open(path,"w")
         return drive.write(file,data)
     else
-        print("System File Operation Error, Drive is read only")
+        print("System file operation error, drive is read only")
+        return false
     end
 end
 
-System.readfile= function(path,driveproxy)
+System.readfile = function(path,driveproxy)
     driveproxy=driveproxy or BOOTDRIVEPROXY
     if driveproxy.exists(path) and not driveproxy.isDirectory(path) then
         local file=driveproxy.open(path)
@@ -26,6 +27,15 @@ System.readfile= function(path,driveproxy)
     else
         return "",false
     end
+end
+
+--just incase special treatment is needed
+System.listDirectory = function(path,driveproxy)
+    driveproxy=driveproxy or BOOTDRIVEPROXY
+    if driveproxy.exists(path) and driveproxy.isDirectory(path) then
+        return driveproxy.list(path)
+    end
+    return false
 end
 
 System.utility.padText = function (txt,length)
@@ -131,7 +141,6 @@ System.filesystem.sanitizePath = function (path)
 
     pathComp = tempPathComp
     pathComp[1] = pathComp[1] or ""
-
     if pathComp[1]:find(":") then
         includeDriveChange = true
         pathComp[1] = string.sub(pathComp[1],1,#pathComp[1]-1)

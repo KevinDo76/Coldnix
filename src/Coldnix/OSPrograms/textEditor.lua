@@ -7,10 +7,12 @@ local filetxt=System.readfile(editorFilePath,drive)
 local yoffset=1
 local x,y=BOOTGPUPROXY.getResolution()
 local gpu=BOOTGPUPROXY
+local rx,ry = gpu.getResolution()
 terminal.stopProcess()
 BOOTGPUPROXY.setBackground(0x000000)
 BOOTGPUPROXY.setForeground(0xffffff)
 BOOTGPUPROXY.fill(1,1,x,y," ")
+BOOTGPUPROXY.set(1,1,"loading")
 _G.controlDown=false
 _G.running=true
 --------------------------------
@@ -60,7 +62,7 @@ local function render()
     BOOTGPUPROXY.setForeground(0xffffff)
     gpu.fill(1,1,x,y," ")
     for i=1,y do
-        gpu.set(1,i+yoffset,lineChunk[i+rendery] or "")
+        gpu.set(1,i+yoffset,string.sub(lineChunk[i+rendery] or "",renderx+1,renderx+1+rx))
     end
     if cstate then
         gpu.setBackground(0xffffff)

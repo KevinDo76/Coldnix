@@ -12,6 +12,8 @@ local module = {}
             end
             count=count*1.2
             print(count)
+            print(os.clock()*100)
+            count=math.min(count,1000000)
         end
     end
 return module

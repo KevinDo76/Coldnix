@@ -59,7 +59,7 @@ _G.wait = function(time)
     computer.ElapseT=computer.uptime()-yieldCheck.start
     if computer.ElapseT>3 then
         print(debug.traceback())
-        error("program termination, too long no yield")
+        --error("program termination, too long no yield")
     end
     while computer.uptime()<endTime do
         EventManager.onSignal(computer.pullSignal(math.clamp(endTime-computer.uptime(),0,0.01)))
@@ -76,6 +76,6 @@ _G.CheckYield = function ()
         --preventing recursive loop
         yieldCheck.start = computer.uptime()
         print(debug.traceback())
-        error("program termination, too long no yield")
+        --error("program termination, too long no yield")
     end
 end

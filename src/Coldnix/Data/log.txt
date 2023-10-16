@@ -15,17 +15,20 @@ New event registered, name: "TerminalInput" for event: "key_down"
 New event registered, name: "TerminalClipboard" for event: "clipboard"
 loaded "/Coldnix/Kernel/Terminal.lua"
 loading "/Coldnix/Kernel/CommandProcessor.lua"
-Valid command: disk
+Valid command: synccheck
 Valid command: clr
+Valid command: disk
 Valid command: cd
-Valid command: restart
 Valid command: help
+Valid command: restart
 Valid command: pong
+Valid command: con
 Valid command: lua
+Valid command: testimg
 Valid command: task
 Valid command: edit
-Valid command: ls
 Valid command: exc
+Valid command: ls
 Valid command: test
 loaded "/Coldnix/Kernel/CommandProcessor.lua"
 loading "/Coldnix/Kernel/TerminationGenerator.lua"
@@ -39,4 +42,3 @@ loading "/Coldnix/Debug/KeyboardInputTest.lua"
 loaded "/Coldnix/Debug/KeyboardInputTest.lua"
 loading "/Coldnix/Debug/GPUCommandLog.lua"
 loaded "/Coldnix/Debug/GPUCommandLog.lua"
-New event registered, name: "LuaTerminalTermination" for event: "SIGTERM"

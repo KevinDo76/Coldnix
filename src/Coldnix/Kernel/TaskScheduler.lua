@@ -22,8 +22,8 @@ end
 TaskScheduler.runTask = function()
     for i,v in pairs(TaskScheduler.tasks) do
         if computer.uptime()>=v[3] and not (v[4]) then
-            TaskScheduler.tasks[i][3]=computer.uptime()+v[2]
             v[1]()
+            TaskScheduler.tasks[i][3]=computer.uptime()+v[2]
         end
     end
 end

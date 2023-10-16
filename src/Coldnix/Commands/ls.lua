@@ -4,7 +4,7 @@ local module = {}
     module.description='List out all files/directories at <path> or the current directory'
     module.func = function (rawText) 
         local args = System.utility.getArgs(rawText)
-        local driveAddress,filepath,driveSearchSucc,drivelookup = System.filesystem.resolveDriveLookup(args[2] or "")
+        local driveAddress,filepath,driveSearchSucc,drivelookup = System.filesystem.resolveDriveLookup(args[2] or System.filesystem.getPrefixWorkingDir(WORKINGDRIVEADDRESS)..currentWorkingDir)
         filepath=System.filesystem.sanitizePath(filepath)
         local workingdrive = BOOTDRIVEADDRESS
         if driveSearchSucc or not drivelookup then

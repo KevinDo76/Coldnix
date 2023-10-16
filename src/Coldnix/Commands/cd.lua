@@ -22,7 +22,7 @@ local module = {}
                 local driveAdd,filepath,succ = System.filesystem.resolveDriveLookup(args[2])
                 if succ then
                     WORKINGDRIVEADDRESS = System.filesystem.resolveFullDriveAddress(driveAdd)
-                    WORKINGDRIVEPROXY = component.proxy(System.filesystem.resolveFullDriveAddress(driveAdd))
+                    WORKINGDRIVEPROXY = component.proxy(WORKINGDRIVEADDRESS)
                     changedir((#filepath==0 and filepath:sub(#filepath,#filepath)~="/" and filepath.."/") or filepath)
                 else
                     print('<'..((driveAdd == "" and "none") or driveAdd)..':/> is not a valid drive address')

@@ -3,7 +3,7 @@ local module = {}
     module.name="lua"
     module.description="Lua interpreter"
     module.func = function (rawText)
-        local func=loadfile("/Coldnix/OSPrograms/luaProcessorProgram.lua")
+        local func=loadfile("/Coldnix/OSPrograms/luaProcessorProgram.lua",true,BOOTDRIVEPROXY,SandBox)
         if func then
             func()
         end

@@ -13,6 +13,7 @@ local systemFiles={
     "/Coldnix/Kernel/KernelPanic.lua",
     "/Coldnix/Kernel/config.lua",
     "/Coldnix/Kernel/System.lua",    
+    "/Coldnix/Kernel/require.lua",
     "/Coldnix/Kernel/log.lua",
     "/Coldnix/Kernel/TaskScheduler.lua",
     "/Coldnix/Kernel/EventManager.lua",
@@ -176,6 +177,7 @@ yieldCheck.start = computer.uptime()
 computer.ElapseT=0
 ExecutionEnv = SandBox
 SandBox.print=print
+SandBox.wait = wait
 print("CHANGED EXECUTION ENVIRONMENT INTO PULLSIGNAL PROTECTED MODE")
 
 --Finished boot sequence
