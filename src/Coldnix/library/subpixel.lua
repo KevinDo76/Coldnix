@@ -47,7 +47,7 @@ module.renderSubPixelImageFromDisk = function(path, posX, posY)
     local hex2bin = {["0"] = "0000",["1"] = "0001",["2"] = "0010",["3"] = "0011",["4"] = "0100",["5"] = "0101",["6"] = "0110",["7"] = "0111",["8"] = "1000",["9"] = "1001",["a"] = "1010",["b"] = "1011",["c"] = "1100",["d"] = "1101",["e"] = "1110",["f"] = "1111"}
     local gpu = BOOTGPUPROXY
     local driveAddress,filepath,driveSearchSucc,drivelookup = System.filesystem.resolveDriveLookup(path)
-    terminal.stopProcess()
+    --terminal.stopProcess()
     if driveSearchSucc or not drivelookup then
         local data,readsucc = System.readfile(filepath,component.proxy(driveAddress))  
         if readsucc then

@@ -1,5 +1,6 @@
 --Build number 2 of this experimental OS thingy(Coldniximage.png)
 --boot beep indication
+
 for i=1,3 do
     computer.beep(1000,0.1)
 end
@@ -156,6 +157,7 @@ print("Coldnix Kernel is starting")
 _G.getExecutionEnvType = function () return "kernel" end
 --executing system executables
 for i,v in ipairs(systemFiles) do
+    if yieldCheck then yieldCheck.start = computer.uptime() end
     if Log then
         Log.writeLog(string.format('loading "%s"',v))
     end
