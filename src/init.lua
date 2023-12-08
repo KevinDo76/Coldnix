@@ -11,16 +11,17 @@ local avaliableHardwaresFound={}
 --all functions in these will always run under kernel environment
 --only newly compiled and executed codes are run under application environment unless they're escalated
 local systemFiles={
-    "/Coldnix/Kernel/KernelPanic.lua",
+    "/Coldnix/Kernel/kernelPanic.lua",
     "/Coldnix/Kernel/config.lua",
-    "/Coldnix/Kernel/System.lua",    
+    "/Coldnix/Kernel/system.lua",    
     "/Coldnix/Kernel/require.lua",
     "/Coldnix/Kernel/log.lua",
-    "/Coldnix/Kernel/TaskScheduler.lua",
-    "/Coldnix/Kernel/EventManager.lua",
-    "/Coldnix/Kernel/Terminal.lua",
-    "/Coldnix/Kernel/CommandProcessor.lua",
-    "/Coldnix/Kernel/TerminationGenerator.lua",
+    "/Coldnix/Kernel/taskScheduler.lua",
+    "/Coldnix/Kernel/eventManager.lua",
+    "/Coldnix/Kernel/terminal.lua",
+    "/Coldnix/Kernel/commandProcessor.lua",
+    "/Coldnix/Kernel/network.lua",
+    "/Coldnix/Kernel/terminationGenerator.lua",
     "/Coldnix/Kernel/systemStatus.lua",
     "/Coldnix/Debug/KeyboardInputTest.lua",
     "/Coldnix/Debug/GPUCommandLog.lua",
@@ -73,7 +74,7 @@ end
             return x
         end
     end
-    --adding in wait(), it's going to get replaced with something else in when EventManager is loaded
+    --adding in wait(), it's going to get replaced with something else in when eventManager is loaded
     _G.wait = function(time)
         local endTime=computer.uptime()+time
         while computer.uptime()<endTime do

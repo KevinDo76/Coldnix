@@ -1,48 +1,48 @@
---EventManager will allow the ability to regsister a function to a signal event
+--eventManager will allow the ability to regsister a function to a signal event
 --allowing the program to respond to stuff like keyboard input.
-_G.EventManager = {}
-EventManager.eventsList={}
-EventManager.regsisterListener = function (eventName,listeningEventName,func)
+_G.eventManager = {}
+eventManager.eventsList={}
+eventManager.regsisterListener = function (eventName,listeningEventName,func)
     if type(func)=="function" then
         --listen for {name, func, is running}
-        EventManager.eventsList[eventName]={listeningEventName,func,true}
+        eventManager.eventsList[eventName]={listeningEventName,func,true}
         Log.writeLog(string.format('New event registered, name: "%s" for event: "%s"',eventName,listeningEventName))
     end
     return false, "Failed to add listener, a function is not passed in"
 end
 
 
-EventManager.resumeListener=function(eventName)
-    if EventManager.eventsList[eventName] then
-        EventManager.eventsList[eventName][3]=true
+eventManager.resumeListener=function(eventName)
+    if eventManager.eventsList[eventName] then
+        eventManager.eventsList[eventName][3]=true
     else
         return false, "Listener not found"    
     end
 end
 
-EventManager.pauseListener=function(eventName)
-    if EventManager.eventsList[eventName] then
-        EventManager.eventsList[eventName][3]=false
+eventManager.pauseListener=function(eventName)
+    if eventManager.eventsList[eventName] then
+        eventManager.eventsList[eventName][3]=false
     else
         return false, "Listener not found"    
     end
 end
 
-EventManager.removeListener = function (eventName)
-    if EventManager.eventsList[eventName] then
-        EventManager.eventsList[eventName] = nil
+eventManager.removeListener = function (eventName)
+    if eventManager.eventsList[eventName] then
+        eventManager.eventsList[eventName] = nil
         return true
     end
     return false, "Listener not found"
 end
 --this would be place into the wait() function since it's the only place that will ever call on eventpull
-EventManager.onSignal = function (name,...)
+eventManager.onSignal = function (name,...)
     if name=="SIGKILL" then
         print(debug.traceback())
         error("Keyboard termination")
     end
     if name~=nil then
-        for i,v in pairs(EventManager.eventsList) do
+        for i,v in pairs(eventManager.eventsList) do
             if v[1]==name and v[3] then
                 v[2](...)
             end
@@ -62,7 +62,7 @@ _G.wait = function(time)
         error("program termination, too long no yield")
     end
     while computer.uptime()<endTime do
-        EventManager.onSignal(computer.pullSignal(math.clamp(endTime-computer.uptime(),0,0.01)))
+        eventManager.onSignal(computer.pullSignal(math.clamp(endTime-computer.uptime(),0,0.01)))
         TaskScheduler.runTask()
     end
     yieldCheck.start=computer.uptime()
@@ -79,3 +79,4 @@ _G.CheckYield = function ()
         error("program termination, too long no yield")
     end
 end
+

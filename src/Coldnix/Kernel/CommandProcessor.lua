@@ -24,6 +24,9 @@ for i=1,#commandDirList do
     commandAPI.validCommands=validCommands
 end
 local function response(rawText)
+    terminal.CursorState = false
+    terminal.typingEnable = false
+    terminal.updateCursor()
     if not commandAPI.noCommandProcess and rawText~="^C" and rawText~="^X" then
         local splitText=string.split(rawText," ")
         local commandName=splitText[1]
@@ -44,6 +47,9 @@ local function response(rawText)
             end
         end
     end
+    terminal.typingEnable = true
+    terminal.CursorFlashFreeze=computer.uptime()+0.5
+    terminal.updateCursor(true)
 end
 if terminal then
     terminal.commandProcessor = response

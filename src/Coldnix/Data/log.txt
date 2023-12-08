@@ -2,20 +2,21 @@
 ---------------------------------------------------
 Log started
 loaded "/Coldnix/Kernel/log.lua"
-loading "/Coldnix/Kernel/TaskScheduler.lua"
-loaded "/Coldnix/Kernel/TaskScheduler.lua"
-loading "/Coldnix/Kernel/EventManager.lua"
-loaded "/Coldnix/Kernel/EventManager.lua"
-loading "/Coldnix/Kernel/Terminal.lua"
+loading "/Coldnix/Kernel/taskScheduler.lua"
+loaded "/Coldnix/Kernel/taskScheduler.lua"
+loading "/Coldnix/Kernel/eventManager.lua"
+loaded "/Coldnix/Kernel/eventManager.lua"
+loading "/Coldnix/Kernel/terminal.lua"
 Added task id: "CursorBlink", with interval: 0.2 sec
 New event registered, name: "TerminalInputTermination" for event: "SIGTERM"
 New event registered, name: "TerminalInputForceTermination" for event: "SIGKILL"
 New event registered, name: "TerminalScroll" for event: "scroll"
 New event registered, name: "TerminalInput" for event: "key_down"
 New event registered, name: "TerminalClipboard" for event: "clipboard"
-loaded "/Coldnix/Kernel/Terminal.lua"
-loading "/Coldnix/Kernel/CommandProcessor.lua"
+loaded "/Coldnix/Kernel/terminal.lua"
+loading "/Coldnix/Kernel/commandProcessor.lua"
 Valid command: synccheck
+Valid command: network
 Valid command: clr
 Valid command: disk
 Valid command: cd
@@ -30,11 +31,17 @@ Valid command: edit
 Valid command: exc
 Valid command: ls
 Valid command: test
-loaded "/Coldnix/Kernel/CommandProcessor.lua"
-loading "/Coldnix/Kernel/TerminationGenerator.lua"
+loaded "/Coldnix/Kernel/commandProcessor.lua"
+loading "/Coldnix/Kernel/network.lua"
+Primary modem set: a746e791-400b-4ee1-8386-04ac412168f5
+New event registered, name: "networkEvent" for event: "modem_message"
+Added task id: "networkCheckOffine", with interval: 1 sec
+Added task id: "networkDiscovery", with interval: 5 sec
+loaded "/Coldnix/Kernel/network.lua"
+loading "/Coldnix/Kernel/terminationGenerator.lua"
 New event registered, name: "TerminationGeneratorDown" for event: "key_down"
 New event registered, name: "TerminationGeneratorUp" for event: "key_up"
-loaded "/Coldnix/Kernel/TerminationGenerator.lua"
+loaded "/Coldnix/Kernel/terminationGenerator.lua"
 loading "/Coldnix/Kernel/systemStatus.lua"
 Added task id: "StatusBarUpdate", with interval: 0.25 sec
 loaded "/Coldnix/Kernel/systemStatus.lua"
@@ -42,3 +49,24 @@ loading "/Coldnix/Debug/KeyboardInputTest.lua"
 loaded "/Coldnix/Debug/KeyboardInputTest.lua"
 loading "/Coldnix/Debug/GPUCommandLog.lua"
 loaded "/Coldnix/Debug/GPUCommandLog.lua"
+New event registered, name: "LuaTerminalTermination" for event: "SIGTERM"
+New event registered, name: "LuaTerminalTermination" for event: "SIGTERM"
+New event registered, name: "LuaTerminalTermination" for event: "SIGTERM"
+Added task id: "TextEditoCursorBlink", with interval: 0.2 sec
+New event registered, name: "editdown" for event: "key_down"
+New event registered, name: "editTermination" for event: "SIGTERM"
+Added task id: "TextEditoCursorBlink", with interval: 0.2 sec
+New event registered, name: "editdown" for event: "key_down"
+New event registered, name: "editTermination" for event: "SIGTERM"
+Added task id: "TextEditoCursorBlink", with interval: 0.2 sec
+New event registered, name: "editdown" for event: "key_down"
+New event registered, name: "editTermination" for event: "SIGTERM"
+Added task id: "TextEditoCursorBlink", with interval: 0.2 sec
+New event registered, name: "editdown" for event: "key_down"
+New event registered, name: "editTermination" for event: "SIGTERM"
+Added task id: "TextEditoCursorBlink", with interval: 0.2 sec
+New event registered, name: "editdown" for event: "key_down"
+New event registered, name: "editTermination" for event: "SIGTERM"
+Added task id: "TextEditoCursorBlink", with interval: 0.2 sec
+New event registered, name: "editdown" for event: "key_down"
+New event registered, name: "editTermination" for event: "SIGTERM"

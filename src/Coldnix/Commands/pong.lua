@@ -5,7 +5,7 @@ local module = {}
     module.func = function (rawText) 
         local func=loadfile("/Coldnix/OSPrograms/pong.lua",true,BOOTDRIVEPROXY,SandBox)
         if func then
-            func()
+            System.utility.loadAsGraphicalApp(func)
         end
         func=nil
     end

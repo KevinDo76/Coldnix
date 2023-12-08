@@ -1,12 +1,7 @@
 print("Starting Pong!")
 wait(0.1)
 local x,y=BOOTGPUPROXY.getResolution()
-local gpu=BOOTGPUPROXY
-terminal.stopProcess()
-gpu.setBackground(0x000000)
-gpu.setForeground(0xffffff)
-gpu.fill(1,1,x,y," ")
-local x,y=gpu.getResolution()
+local gpu = BOOTGPUPROXY
 --config
 local padSize=5
 local maxPaddle=2
@@ -28,11 +23,11 @@ local keyStatus={
 }
 
 --eventRegistration
-EventManager.regsisterListener("pongTermination","SIGTERM",function()
+eventManager.regsisterListener("pongTermination","SIGTERM",function()
     running=false
 end)
 
-EventManager.regsisterListener("pongKeyboardDown","key_down",function(componentId,asciiNum,keyboardcode) 
+eventManager.regsisterListener("pongKeyboardDown","key_down",function(componentId,asciiNum,keyboardcode) 
     if asciiNum==115 then
         keyStatus.up=true
     elseif asciiNum==119 then
@@ -41,7 +36,7 @@ EventManager.regsisterListener("pongKeyboardDown","key_down",function(componentI
 end)
 
 
-EventManager.regsisterListener("pongKeyboardUp","key_up",function(componentId,asciiNum,keyboardcode) 
+eventManager.regsisterListener("pongKeyboardUp","key_up",function(componentId,asciiNum,keyboardcode) 
     if asciiNum==115 then
         keyStatus.up=false
     elseif asciiNum==119 then
@@ -131,8 +126,7 @@ while running do
 end
 
 --exit routine
-EventManager.removeListener("pongTermination")
-EventManager.removeListener("pongKeyboardUp")
-EventManager.removeListener("pongKeyboardDown")
-terminal.resumeProcess()
+eventManager.removeListener("pongTermination")
+eventManager.removeListener("pongKeyboardUp")
+eventManager.removeListener("pongKeyboardDown")
 print("Exited Pong")

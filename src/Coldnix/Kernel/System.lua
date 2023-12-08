@@ -38,6 +38,17 @@ System.listDirectory = function(path,driveproxy)
     return false
 end
 
+System.utility.loadAsGraphicalApp = function(func,...)
+    local gpu=BOOTGPUPROXY
+    local x,y = gpu.getResolution()
+    terminal.stopProcess()
+    gpu.setBackground(0x000000)
+    gpu.setForeground(0xffffff)
+    gpu.fill(1,1,x,y," ")
+    func(...)
+    terminal.resumeProcess()
+end
+
 System.utility.padText = function (txt,length)
     while (#txt<length) do
         txt=txt.." "
@@ -48,6 +59,15 @@ end
 System.utility.floatCut = function (num,fdc)
     fdc=fdc or 1
     return math.floor(num*(10^fdc))/(10^fdc)
+end
+--for command processing
+table.getIndex = function(table,element)
+    for i,v in pairs(table) do
+        if v == element then
+            return i
+        end
+    end
+    return -1
 end
 --more advance version of string.split, this can handle text in "" for aurgments with spaces
 System.utility.getArgs = function (txt)

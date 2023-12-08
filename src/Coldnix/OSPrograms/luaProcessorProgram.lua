@@ -43,7 +43,7 @@ local function listToString(obj,name,minimal)
     end
 end
 
-EventManager.regsisterListener("LuaTerminalTermination","SIGTERM",function() 
+eventManager.regsisterListener("LuaTerminalTermination","SIGTERM",function() 
     running=false
 end)
 
@@ -86,4 +86,4 @@ terminal.prefix=System.filesystem.getPrefixWorkingDir()..currentWorkingDir..": "
 terminal.reload()
 _G.exit=nil
 _G.ControlDown=nil
-EventManager.removeListener("LuaTerminalTermination")
+eventManager.removeListener("LuaTerminalTermination")

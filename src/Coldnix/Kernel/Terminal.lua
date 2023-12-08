@@ -12,6 +12,7 @@ terminal.CursorX=0
 terminal.CursorState=false
 terminal.CursorFlashFreeze=computer.uptime()
 terminal.typeBarYOffset=0
+terminal.typingEnable = true
 terminal.commandProcessor = function (rawText) end
 local processing=true
 local moveDB=computer.uptime()
@@ -139,9 +140,9 @@ terminal.resumeProcess = function()
     processing = true
     TaskScheduler.resumeTask("StatusBarUpdate")
     TaskScheduler.resumeTask("CursorBlink")
-    EventManager.resumeListener("TerminalInput")
-    EventManager.resumeListener("TerminalClipboard")
-    EventManager.resumeListener("TerminalScroll")
+    eventManager.resumeListener("TerminalInput")
+    eventManager.resumeListener("TerminalClipboard")
+    eventManager.resumeListener("TerminalScroll")
     terminal.reload()
 end
 
@@ -149,9 +150,9 @@ terminal.stopProcess = function(clearScreen)
     processing = false
     TaskScheduler.pauseTask("StatusBarUpdate")
     TaskScheduler.pauseTask("CursorBlink")
-    EventManager.pauseListener("TerminalInput")
-    EventManager.pauseListener("TerminalClipboard")
-    EventManager.pauseListener("TerminalScroll")
+    eventManager.pauseListener("TerminalInput")
+    eventManager.pauseListener("TerminalClipboard")
+    eventManager.pauseListener("TerminalScroll")
     if clearScreen then
         BOOTGPUPROXY.fill(terminal.x,terminal.y,terminal.width,terminal.height," ")
     end
@@ -213,7 +214,7 @@ terminal.updateCursor = function (state)
         local cy=math.clamp(terminal.y+terminal.height-1-terminal.typeBarYOffset+lineOffset,terminal.y,ry)
         local text=gpu.get(cx,cy)
         --local text=" "
-        if state then
+        if state and terminal.typingEnable then
             gpu.setBackground(0xffffff)
             gpu.setForeground(0x000000)
         end
@@ -222,11 +223,13 @@ terminal.updateCursor = function (state)
 end
 
 terminal.type = function (txt)
-    typeBuffer=string.sub(typeBuffer,1,terminal.CursorX)..txt..string.sub(typeBuffer,terminal.CursorX+1,#typeBuffer)
-    terminal.CursorX=terminal.CursorX+#txt
-    terminal.CursorFlashFreeze=computer.uptime()+0.5
-    terminal.updateTypeBar()
-    terminal.updateCursor(true)
+    if terminal.typingEnable then
+        typeBuffer=string.sub(typeBuffer,1,terminal.CursorX)..txt..string.sub(typeBuffer,terminal.CursorX+1,#typeBuffer)
+        terminal.CursorX=terminal.CursorX+#txt
+        terminal.CursorFlashFreeze=computer.uptime()+0.5
+        terminal.updateTypeBar()
+        terminal.updateCursor(true)
+    end
 end
 
 terminal.delete = function()
@@ -250,9 +253,11 @@ end
 terminal.input = function (prefix)
     if processing then
         waitingForTextInput = true
+        local previousTypingState = terminal.typingEnable
         local previousPrefix=terminal.prefix
         terminal.prefix=prefix or ""
         terminal.updateTypeBar()
+        terminal.typingEnable = true
         terminal.CursorFlashFreeze=computer.uptime()+0.5
         terminal.updateCursor(true)
         while wait(0.01) do
@@ -264,6 +269,7 @@ terminal.input = function (prefix)
         terminal.updateTypeBar()
         terminal.CursorFlashFreeze=computer.uptime()+0.5
         terminal.updateCursor(true)
+        terminal.typingEnable = previousTypingState
         return typeHistory[#typeHistory]
     else
         return ""
@@ -313,15 +319,15 @@ end
 --adding task
 TaskScheduler.addTask("CursorBlink",cursorBlink,0.2)
 --regsistering keyboard event
-EventManager.regsisterListener("TerminalInputTermination","SIGTERM",function() 
+eventManager.regsisterListener("TerminalInputTermination","SIGTERM",function() 
     waitingForTextInput=false
 end)
 
-EventManager.regsisterListener("TerminalInputForceTermination","SIGKILL",function() 
+eventManager.regsisterListener("TerminalInputForceTermination","SIGKILL",function() 
     waitingForTextInput=false
 end)
 
-EventManager.regsisterListener("TerminalScroll","scroll",function(componentId,x,y,direction)
+eventManager.regsisterListener("TerminalScroll","scroll",function(componentId,x,y,direction)
     if direction>0 then
         if pageScroll<#terminal.screenHistory-terminal.height+1+terminal.typeBarYOffset then
             pageScroll=pageScroll+1
@@ -335,7 +341,7 @@ EventManager.regsisterListener("TerminalScroll","scroll",function(componentId,x,
     end
 end)
 
-EventManager.regsisterListener("TerminalInput","key_down",function(componentId,asciiNum,keyboardcode)
+eventManager.regsisterListener("TerminalInput","key_down",function(componentId,asciiNum,keyboardcode)
     if asciiNum>=32 and asciiNum<=126 then
         terminal.type(string.char(asciiNum))
     end
@@ -418,7 +424,7 @@ EventManager.regsisterListener("TerminalInput","key_down",function(componentId,a
     end
 end)
 
-EventManager.regsisterListener("TerminalClipboard","clipboard", function(_,text) 
+eventManager.regsisterListener("TerminalClipboard","clipboard", function(_,text) 
     terminal.type(text)
 end)
 --final init 

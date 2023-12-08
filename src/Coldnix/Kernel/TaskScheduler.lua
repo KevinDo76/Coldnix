@@ -12,6 +12,8 @@ TaskScheduler.addTask = function (taskname, taskCode, interval)
         else
             error("Failed to complie source into function(TaskScheduler.addTask()), error: "..err)
         end
+    elseif taskCode==nil then
+        error("Failed to complie source into function(TaskScheduler.addTask()), error: taskCode is nil")
     end
     --format for storing tasks metadata are {name[int],interval[int],nextruntime[int],paused[boolen]}
     TaskScheduler.tasks[taskname]={taskCode,interval,computer.uptime(),false}

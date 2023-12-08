@@ -11,7 +11,8 @@ local module = {}
                 if not drive.isDirectory(editorFilePath) then
                     local func=loadfile("/Coldnix/OSPrograms/textEditor.lua")
                     if func then
-                        func(driveaddress,editorFilePath)
+                        print('opening "'..System.filesystem.getPrefixWorkingDir(driveAddress)..System.filesystem.sanitizePath(editorFilePath)..'"')
+                        System.utility.loadAsGraphicalApp(func,driveaddress,editorFilePath,table.getIndex(args,"-communist")~=-1)
                     end
                     func=nil
                 else
