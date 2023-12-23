@@ -33,15 +33,38 @@ local function response(rawText)
         if commandName~=nil then
             print(string.rep("^",math.min(#rawText+#terminal.prefix,terminal.width)))
             if validCommands[commandName] then
+                --registered event before execution
+                local beforeEvent={}
+
+                for i,v in pairs(eventManager.eventsList) do
+                    beforeEvent[#beforeEvent+1] = i
+                end
+                --execution
                 if keepinmem==1 then
-                    _G.currentTraceback = debug.traceback()
-                    validCommands[commandName][3].func(rawText)
+                    local status = xpcall(
+                        validCommands[commandName][3].func,
+                        recordTraceback,
+                        rawText
+                    )
+                    if not status then
+                        KernelPanic(lastError,currentTraceback,true)
+                    end
                 else
                     local metadata=validCommands[commandName]
                     local file=loadfile(commandDir.."/"..metadata[3],true,BOOTDRIVEPROXY,exeEnv)()
-                    _G.currentTraceback = debug.traceback()
-                    file.func(rawText)
+                    local status = xpcall(file.func, recordTraceback, rawText)
+                    if not status then
+                        KernelPanic(lastError,currentTraceback,true)
+                    end
                 end
+
+                for currentEvent,_ in pairs(eventManager.eventsList) do
+                    if table.getIndex(beforeEvent, currentEvent)==-1 then
+                        eventManager.removeListener(currentEvent)
+                        print("Stray events removed:",currentEvent)
+                    end
+                end 
+
             else 
                 print("Unknown command \""..commandName.."\", use \"help\" for a list of avaliable commands")
             end

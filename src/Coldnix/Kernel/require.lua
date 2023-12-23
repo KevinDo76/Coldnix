@@ -11,7 +11,7 @@ if loadInMem then
         if not libComplied then error("Failed to complie "..libDir..v) end
         local data = libComplied()
         loadedLib[data.name] = data
-        print("[  " .. string.format( "%.2f", tostring (computer.uptime())) .."s  ] loaded \""..libDir.."/"..v.."\"")
+        print("[  " .. string.format( "%.2f", tostring (computer.uptime())) .."s  ] loaded \""..libDir..v.."\"")
     end
 end
 _G.require = function(libName) 

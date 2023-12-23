@@ -84,6 +84,4 @@ print("Exiting ".._VERSION.." Terminal")
 commandAPI.noCommandProcess=false
 terminal.prefix=System.filesystem.getPrefixWorkingDir()..currentWorkingDir..": "
 terminal.reload()
-_G.exit=nil
-_G.ControlDown=nil
 eventManager.removeListener("LuaTerminalTermination")

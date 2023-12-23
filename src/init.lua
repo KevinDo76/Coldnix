@@ -1,204 +1,146 @@
---Build number 2 of this experimental OS thingy(Coldniximage.png)
---boot beep indication
-
-for i=1,3 do
-    computer.beep(1000,0.1)
+--Coldnix bootloader
+local BOOTDRIVEADDRESS=computer.getBootAddress()
+local BOOTDRIVEPROXY=component.proxy(BOOTDRIVEADDRESS)
+local initFilePath = "/boot.lua"
+local waitForSelection = false
+local avaliableFileSystem = {}
+local selectedDrive = 1
+local timeoffset = 0
+local halted = false
+--localize functions, these are meant for bootloader operations only
+keyResponse = function(code) end
+local wait = function(time)
+    local endTime=computer.uptime()+time
+    while computer.uptime()<endTime do
+        local name,_,_,code=computer.pullSignal(endTime-computer.uptime())
+        if name == "key_down" then
+            keyResponse(code)
+        end
+    end
+    return true
 end
 
---starting settings
-local requiredHardwares={"gpu","screen","keyboard"}
-local avaliableHardwaresFound={}
---all functions in these will always run under kernel environment
---only newly compiled and executed codes are run under application environment unless they're escalated
-local systemFiles={
-    "/Coldnix/Kernel/kernelPanic.lua",
-    "/Coldnix/Kernel/config.lua",
-    "/Coldnix/Kernel/system.lua",    
-    "/Coldnix/Kernel/require.lua",
-    "/Coldnix/Kernel/log.lua",
-    "/Coldnix/Kernel/taskScheduler.lua",
-    "/Coldnix/Kernel/eventManager.lua",
-    "/Coldnix/Kernel/terminal.lua",
-    "/Coldnix/Kernel/commandProcessor.lua",
-    "/Coldnix/Kernel/network.lua",
-    "/Coldnix/Kernel/terminationGenerator.lua",
-    "/Coldnix/Kernel/systemStatus.lua",
-    "/Coldnix/Debug/KeyboardInputTest.lua",
-    "/Coldnix/Debug/GPUCommandLog.lua",
-}
-
---getting the bootdrive
-_G.BOOTDRIVEADDRESS=computer.getBootAddress()
-_G.BOOTDRIVEPROXY=component.proxy(BOOTDRIVEADDRESS)
-_G.WORKINGDRIVEADDRESS=BOOTDRIVEADDRESS
-_G.WORKINGDRIVEPROXY=BOOTDRIVEPROXY
-_G.currentWorkingDir = "/Coldnix"
-SandBox = {}
-ExecutionEnv = _G
-
-local updateExeEnv = function()
-    for i,v in pairs(_G) do
-        if i~="_G" and i~="SandBox" and i~="ExecutionEnv" and i~="getExecutionEnvType" and not SandBox[i] then
-            SandBox[i] = _G[i]
+avaliables = function(type)
+    local attached=component.list()
+    for i,v in pairs(attached) do
+        if v==type then
+            return i
         end
     end
-    SandBox._G = SandBox
+    return false
 end
 
---defining basic functions that's needed for the OS
-    --adding component.avaliables to the OS because it's not included for reasons
-    function component.avaliables(type)
-        local attached=component.list()
-        for i,v in pairs(attached) do
-            if v==type then
-                return i
-            end
-        end
-        return false
+local loadstring=function (str)
+    local func,errorm=load(str,"=COLDNIX_BOOT_LOADER","bt",_G)
+    if func then
+        return func
+    else
+        error(errorm)
     end
-    --adding in string.split because that's pretty handy for many situations
-    function string.split(str,sep)
-        local sep, fields = sep or ":", {}
-        local pattern = string.format("([^%s]+)", sep)
-        str:gsub(pattern, function(c) fields[#fields+1] = c end)
-        return fields
-    end
-    
-    --adding in math.clamp because that's also not a thing for reasons
-    function math.clamp(x,min,max)
-        if x<min then
-            return min
-        elseif x>max then
-            return max
-        else
-            return x
-        end
-    end
-    --adding in wait(), it's going to get replaced with something else in when eventManager is loaded
-    _G.wait = function(time)
-        local endTime=computer.uptime()+time
-        while computer.uptime()<endTime do
-            computer.pullSignal(endTime-computer.uptime())
-        end
-        return true
-    end
-    --adding in loadstring, practically the most important function for the OS
-    _G.loadstring=function (str,envname,errorOnFail,envType)
-        envname=envname or "loadstring_env"
-        envType=envType or _G
-        local func,errorm=load(str,"="..envname,"bt",envType)
-        if func then
-            return func
-        else
-            if errorOnFail then
-                error(errorm)
-            else
-                return false,errorm
-            end
-        end
-    end
-    --adding in loadfile()
-    _G.loadfile=function(filepath,errorOnFail,drive,envType)
-        drive=drive or BOOTDRIVEPROXY
-        envType=envType or _G
-        if errorOnFail==nil then  errorOnFail=true end --if erroronfail is not set, set it to true
-        local file=drive.open(filepath)
+end
+
+local readfile = function(path,driveproxy)
+    if driveproxy.exists(path) and not driveproxy.isDirectory(path) then
+        local file=driveproxy.open(path)
         local finalEx=""
         repeat 
-            local currentLoad=drive.read(file,math.huge)
+            local currentLoad=driveproxy.read(file,math.huge)
             finalEx=finalEx..(currentLoad or "")
         until not currentLoad
-        drive.close(file)
-        return loadstring(finalEx,filepath,errorOnFail,envType)
+        return finalEx,true
+    else
+        return "",false
     end
---checking for hardware requirement
-for i,v in pairs(requiredHardwares) do
-    local result=component.avaliables(v)
-    if not result then
-        for c=1,i do
-            computer.beep(200,0.2)
-            wait(0.1)
+end
+
+local loadfile=function(filepath,drive)
+    drive=drive or BOOTDRIVEPROXY 
+    local file=drive.open(filepath)
+    local finalEx=""
+    repeat 
+        local currentLoad=drive.read(file,math.huge)
+        finalEx=finalEx..(currentLoad or "")
+    until not currentLoad
+    drive.close(file)
+    return loadstring(finalEx)
+end
+
+keyResponse = function(keyID)
+    if keyID == 208 and selectedDrive<#avaliableFileSystem then
+        selectedDrive=selectedDrive+1
+        timeoffset = computer.uptime()
+    elseif keyID == 200 and selectedDrive>1 then
+        selectedDrive=selectedDrive-1
+        timeoffset = computer.uptime()
+    elseif keyID == 28 then
+        waitForSelection = false
+        if halted then computer.shutdown(true) end
+        if selectedDrive~=1 then
+            initFilePath = "/init.lua"
+            BOOTDRIVEADDRESS = avaliableFileSystem[selectedDrive]
+            BOOTDRIVEPROXY = component.proxy(BOOTDRIVEADDRESS)
+            computer.getBootAddress = load("return '"..BOOTDRIVEADDRESS.."'","=COLDNIX_BOOT_LOADER","bt",_G)
+            computer.setBootAddress = function() end
         end
-        error("Missing required hardware: "..v)
     end
-    avaliableHardwaresFound[v]=result
 end
-
---setting up the gpu and screen
-_G.BOOTGPUADDRESS=avaliableHardwaresFound["gpu"]
-_G.BOOTGPUPROXY=component.proxy(BOOTGPUADDRESS)
-    --binding the gpu to the screen
-    local success,err=BOOTGPUPROXY.bind(avaliableHardwaresFound["screen"], true)
-    if not success then
-        error("Failed to bind the primary gpu to a screen, error: "..err)
-    end
-    --clearing the screen
-    local rx,ry=BOOTGPUPROXY.getResolution()
-    BOOTGPUPROXY.fill(1,1,rx,ry," ")
-
---SandBox Environment Creation
-updateExeEnv()
-
-SandBox.computer = {}
-for i,v in pairs(_G.computer) do
-    if i~="pullSignal" then
-        SandBox.computer[i] = v
+--getting GPU
+local BOOTGPUADDRESS=avaliables("gpu")
+local BOOTGPUPROXY=component.proxy(BOOTGPUADDRESS)
+--setting up screen
+local rx,ry=BOOTGPUPROXY.getResolution()
+BOOTGPUPROXY.setBackground(0x000000)
+BOOTGPUPROXY.setForeground(0xffffff)
+BOOTGPUPROXY.fill(1,1,rx,ry," ")
+BOOTGPUPROXY.set(1,1,"Coldnix Boot Loader")
+BOOTGPUPROXY.set(1,2,"Multiple bootable drives detected")
+BOOTGPUPROXY.set(1,3,string.rep("═",rx))
+table.insert(avaliableFileSystem,BOOTDRIVEADDRESS)
+for i,v in pairs(component.list()) do
+    if v == "filesystem" and i~=BOOTDRIVEADDRESS then
+        if component.proxy(i).exists("/init.lua") and not component.proxy(i).isDirectory("/init.lua") then
+            table.insert(avaliableFileSystem,i)
+        end
     end
 end
 
-SandBox.ChangeEnv=false
-SandBox.getExecutionEnvType = function () return "application" end
-SandBox.loadstring = function(str,envname,errorOnFail) return loadstring(str,envname,errorOnFail,SandBox) end
-SandBox.loadfile = function(filepath,errorOnFail,drive) return loadfile(filepath,errorOnFail,drive,SandBox) end
---placeholder for print, allowing the core OS to load without the terminal ontop
-local tempLcount=1
-_G.print=function(text) BOOTGPUPROXY.set(1,tempLcount,text) tempLcount=tempLcount+1 end
---launching other operating system system files
-print("Coldnix Kernel is starting")
-_G.getExecutionEnvType = function () return "kernel" end
---executing system executables
-for i,v in ipairs(systemFiles) do
-    if yieldCheck then yieldCheck.start = computer.uptime() end
-    if Log then
-        Log.writeLog(string.format('loading "%s"',v))
-    end
-    local suc,err=pcall(function() loadfile(v)() end)
-    if not suc then
-        KernelPanic(err)
-    end
-    if Log then
-        Log.writeLog(string.format('loaded "%s"',v))
-    end
-
-    if print then
-        print("[  " .. string.format( "%.2f", tostring (computer.uptime())) .."s  ] loaded \""..v.."\"")
-    end
-    updateExeEnv()
-    
+if #avaliableFileSystem>1 then
+    waitForSelection=true
 end
-yieldCheck.start = computer.uptime()
-computer.ElapseT=0
-ExecutionEnv = SandBox
-SandBox.print=print
-SandBox.wait = wait
-print("CHANGED EXECUTION ENVIRONMENT INTO PULLSIGNAL PROTECTED MODE")
 
---Finished boot sequence
-print("Done! Coldnix kernel loaded")
---main loops for the computer that keeps it running and run other programs
-
-while true do 
-    _G.currentTraceback = ""
-    local s,e = pcall(function ()
-        wait(0.01)
-    end)
-    if SandBox.ChangeEnv then
-        ExecutionEnv = _G
-        SandBox.ChangeEnv = false
-        print("Changed Env")
+while waitForSelection do
+    wait(0.025)
+    for i,v in pairs(avaliableFileSystem) do
+        BOOTGPUPROXY.setBackground(0x000000)
+        BOOTGPUPROXY.setForeground(0xffffff)
+        local text = "("..i.."): "..v.." | "..(component.proxy(v).getLabel() or "no label").." | "..tostring(math.floor(component.proxy(v).spaceUsed()/1024)).."KB/"..tostring(math.floor(component.proxy(v).spaceTotal()/1024)).."KB"
+        if i==selectedDrive then
+            BOOTGPUPROXY.setBackground(0xffffff)
+            BOOTGPUPROXY.setForeground(0x000000)
+            if #text-rx>0 then
+                text = " "..text.." "
+                local maxShift = math.max(#text-rx,0)
+                local scrollForShiftshift = math.floor((computer.uptime()-timeoffset)*8)%(maxShift*2)
+                local scrollBackShift = math.max(scrollForShiftshift-maxShift,0)
+                local shift = math.min(scrollForShiftshift,maxShift)-scrollBackShift
+                text = string.sub(text,shift+1,rx+shift+1)     
+            end
+        end
+        BOOTGPUPROXY.set(1,i+3,text)
     end
-    if not s then
+end
 
-        KernelPanic(e,currentTraceback)
-    end
+BOOTGPUPROXY.setBackground(0x000000)
+BOOTGPUPROXY.setForeground(0xffffff)
+BOOTGPUPROXY.fill(1,1,rx,ry," ")
+--starting the selected OS
+local osInit = loadfile(initFilePath,BOOTDRIVEPROXY)
+if osInit then
+    osInit()
+end
+halted = true
+BOOTGPUPROXY.set(1,1,"OS HALTED OR ENCOUNTERED AN ERROR WHILE COMPILING")
+
+while true do
+    wait(1)
 end

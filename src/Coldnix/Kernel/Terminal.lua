@@ -172,6 +172,8 @@ terminal.PanicReset = function(class)
         print(">>>Terminal panic reloaded<<<")
     elseif class==1 then
         print(">>>Task force terminated<<<")
+    elseif class==2 then
+        print("An error has occured while executing this command")
     end
 end
 

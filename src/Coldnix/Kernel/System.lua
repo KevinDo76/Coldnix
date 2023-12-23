@@ -45,7 +45,10 @@ System.utility.loadAsGraphicalApp = function(func,...)
     gpu.setBackground(0x000000)
     gpu.setForeground(0xffffff)
     gpu.fill(1,1,x,y," ")
-    func(...)
+    local status = xpcall(func, recordTraceback, ...)
+    if not status then
+        KernelPanic(lastError,currentTraceback,true)
+    end
     terminal.resumeProcess()
 end
 

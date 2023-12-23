@@ -30,6 +30,7 @@ Valid command: task
 Valid command: edit
 Valid command: exc
 Valid command: ls
+Valid command: error
 Valid command: test
 loaded "/Coldnix/Kernel/commandProcessor.lua"
 loading "/Coldnix/Kernel/network.lua"
@@ -52,21 +53,11 @@ loaded "/Coldnix/Debug/GPUCommandLog.lua"
 New event registered, name: "LuaTerminalTermination" for event: "SIGTERM"
 New event registered, name: "LuaTerminalTermination" for event: "SIGTERM"
 New event registered, name: "LuaTerminalTermination" for event: "SIGTERM"
-Added task id: "TextEditoCursorBlink", with interval: 0.2 sec
-New event registered, name: "editdown" for event: "key_down"
-New event registered, name: "editTermination" for event: "SIGTERM"
-Added task id: "TextEditoCursorBlink", with interval: 0.2 sec
-New event registered, name: "editdown" for event: "key_down"
-New event registered, name: "editTermination" for event: "SIGTERM"
-Added task id: "TextEditoCursorBlink", with interval: 0.2 sec
-New event registered, name: "editdown" for event: "key_down"
-New event registered, name: "editTermination" for event: "SIGTERM"
-Added task id: "TextEditoCursorBlink", with interval: 0.2 sec
-New event registered, name: "editdown" for event: "key_down"
-New event registered, name: "editTermination" for event: "SIGTERM"
-Added task id: "TextEditoCursorBlink", with interval: 0.2 sec
-New event registered, name: "editdown" for event: "key_down"
-New event registered, name: "editTermination" for event: "SIGTERM"
-Added task id: "TextEditoCursorBlink", with interval: 0.2 sec
-New event registered, name: "editdown" for event: "key_down"
-New event registered, name: "editTermination" for event: "SIGTERM"
+New event registered, name: "pongTermination" for event: "SIGTERM"
+New event registered, name: "pongKeyboardDown" for event: "key_down"
+New event registered, name: "pongKeyboardUp" for event: "key_up"
+New event registered, name: "LuaTerminalTermination" for event: "SIGTERM"
+New event registered, name: "networkInfoTermination" for event: "SIGTERM"
+New event registered, name: "pongTermination" for event: "SIGTERM"
+New event registered, name: "pongKeyboardDown" for event: "key_down"
+New event registered, name: "pongKeyboardUp" for event: "key_up"

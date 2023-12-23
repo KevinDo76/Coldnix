@@ -38,7 +38,6 @@ end
 --this would be place into the wait() function since it's the only place that will ever call on eventpull
 eventManager.onSignal = function (name,...)
     if name=="SIGKILL" then
-        print(debug.traceback())
         error("Keyboard termination")
     end
     if name~=nil then
@@ -54,11 +53,9 @@ end
 _G.yieldCheck={}
 yieldCheck.start=computer.uptime()
 _G.wait = function(time)
-    _G.currentTraceback = debug.traceback()
     local endTime=computer.uptime()+(time or 0.01)
     computer.ElapseT=computer.uptime()-yieldCheck.start
     if computer.ElapseT>3 then
-        print(debug.traceback())
         error("program termination, too long no yield")
     end
     while computer.uptime()<endTime do
@@ -75,7 +72,7 @@ _G.CheckYield = function ()
     if computer.ElapseT>3 then
         --preventing recursive loop
         yieldCheck.start = computer.uptime()
-        print(debug.traceback())
+
         error("program termination, too long no yield")
     end
 end
