@@ -133,9 +133,11 @@ end
 BOOTGPUPROXY.setBackground(0x000000)
 BOOTGPUPROXY.setForeground(0xffffff)
 BOOTGPUPROXY.fill(1,1,rx,ry," ")
+_G.trueUpTime = computer.uptime
 --starting the selected OS
 local osInit = loadfile(initFilePath,BOOTDRIVEPROXY)
 if osInit then
+    computer.uptime = load("return _G.trueUpTime()-'".._G.trueUpTime().."'","=COLDNIX_BOOT_LOADER","bt",_G) --this reset the default uptime function to 0 on real system start
     osInit()
 end
 halted = true

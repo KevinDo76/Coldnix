@@ -14,12 +14,27 @@ System.writefile=function (path,data,drive)
     end
 end
 
+System.getFileHandle = function(path,driveproxy)
+    driveproxy=driveproxy or BOOTDRIVEPROXY
+    if driveproxy.exists(path) and not driveproxy.isDirectory(path) then
+        local file=driveproxy.open(path)
+        return file
+    end
+    return false
+end
+
 System.readfile = function(path,driveproxy)
     driveproxy=driveproxy or BOOTDRIVEPROXY
+    local c=0
     if driveproxy.exists(path) and not driveproxy.isDirectory(path) then
         local file=driveproxy.open(path)
         local finalEx=""
         repeat 
+            c=c+1
+            if c>100 then
+                wait()
+                c=0
+            end
             local currentLoad=driveproxy.read(file,math.huge)
             finalEx=finalEx..(currentLoad or "")
         until not currentLoad
@@ -49,6 +64,7 @@ System.utility.loadAsGraphicalApp = function(func,...)
     if not status then
         KernelPanic(lastError,currentTraceback,true)
     end
+    BOOTGPUPROXY.setActiveBuffer(0)
     terminal.resumeProcess()
 end
 

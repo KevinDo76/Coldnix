@@ -19,7 +19,9 @@ Valid command: synccheck
 Valid command: network
 Valid command: clr
 Valid command: disk
+Valid command: net
 Valid command: cd
+Valid command: vid
 Valid command: help
 Valid command: restart
 Valid command: pong
@@ -34,10 +36,13 @@ Valid command: error
 Valid command: test
 loaded "/Coldnix/Kernel/commandProcessor.lua"
 loading "/Coldnix/Kernel/network.lua"
-Primary modem set: a746e791-400b-4ee1-8386-04ac412168f5
-New event registered, name: "networkEvent" for event: "modem_message"
+New event registered, name: "networkCardDetach" for event: "component_removed"
+New event registered, name: "networkCardAttach" for event: "component_added"
+New event registered, name: "networkEvent-Discovery" for event: "modem_message"
 Added task id: "networkCheckOffine", with interval: 1 sec
 Added task id: "networkDiscovery", with interval: 5 sec
+New event registered, name: "networkEvent-RNP" for event: "modem_message"
+Added task id: "RNP-PeriodicTasks", with interval: 0.05 sec
 loaded "/Coldnix/Kernel/network.lua"
 loading "/Coldnix/Kernel/terminationGenerator.lua"
 New event registered, name: "TerminationGeneratorDown" for event: "key_down"
@@ -50,14 +55,5 @@ loading "/Coldnix/Debug/KeyboardInputTest.lua"
 loaded "/Coldnix/Debug/KeyboardInputTest.lua"
 loading "/Coldnix/Debug/GPUCommandLog.lua"
 loaded "/Coldnix/Debug/GPUCommandLog.lua"
-New event registered, name: "LuaTerminalTermination" for event: "SIGTERM"
-New event registered, name: "LuaTerminalTermination" for event: "SIGTERM"
-New event registered, name: "LuaTerminalTermination" for event: "SIGTERM"
-New event registered, name: "pongTermination" for event: "SIGTERM"
-New event registered, name: "pongKeyboardDown" for event: "key_down"
-New event registered, name: "pongKeyboardUp" for event: "key_up"
-New event registered, name: "LuaTerminalTermination" for event: "SIGTERM"
-New event registered, name: "networkInfoTermination" for event: "SIGTERM"
-New event registered, name: "pongTermination" for event: "SIGTERM"
-New event registered, name: "pongKeyboardDown" for event: "key_down"
-New event registered, name: "pongKeyboardUp" for event: "key_up"
+loading "/Coldnix/Kernel/autorun.lua"
+loaded "/Coldnix/Kernel/autorun.lua"

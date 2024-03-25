@@ -25,6 +25,7 @@ local systemFiles={
     "/Coldnix/Kernel/systemStatus.lua",
     "/Coldnix/Debug/KeyboardInputTest.lua",
     "/Coldnix/Debug/GPUCommandLog.lua",
+    "/Coldnix/Kernel/autorun.lua"
 }
 
 --getting the bootdrive
@@ -163,6 +164,10 @@ for i,v in pairs(_G.computer) do
         SandBox.computer[i] = v
     end
 end
+
+SandBox.debug = {
+    traceback = debug.traceback
+}
 
 SandBox.ChangeEnv=false
 SandBox.getExecutionEnvType = function () return "application" end

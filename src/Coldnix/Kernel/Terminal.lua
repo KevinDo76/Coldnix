@@ -163,9 +163,11 @@ terminal.getProcessState = function()
 end
 
 terminal.PanicReset = function(class)
+    BOOTGPUPROXY.setActiveBuffer(0)
     commandAPI.noCommandProcess=false
     waitingForTextInput = false
     terminal.prefix=System.filesystem.getPrefixWorkingDir()..currentWorkingDir..": "
+    BOOTGPUPROXY.setActiveBuffer(0)
     terminal.resumeProcess()
     if class==0 then
         Log.writeLog(">>>Terminal panic reloaded<<<")

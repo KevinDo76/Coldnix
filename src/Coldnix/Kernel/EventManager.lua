@@ -55,7 +55,7 @@ yieldCheck.start=computer.uptime()
 _G.wait = function(time)
     local endTime=computer.uptime()+(time or 0.01)
     computer.ElapseT=computer.uptime()-yieldCheck.start
-    if computer.ElapseT>3 then
+    if computer.ElapseT>4 then
         error("program termination, too long no yield")
     end
     while computer.uptime()<endTime do
@@ -63,13 +63,15 @@ _G.wait = function(time)
         TaskScheduler.runTask()
     end
     yieldCheck.start=computer.uptime()
+    CheckYield()
     return true 
 end
 
 --check when was the last time wait() was ran. Meant to be inserted at the top of system api functions/print/etc. running wait() is important because it register all user input
 _G.CheckYield = function ()
     computer.ElapseT=computer.uptime()-yieldCheck.start
-    if computer.ElapseT>3 then
+    SandBox.computer.ElapseT = computer.ElapseT
+    if computer.ElapseT>4 then
         --preventing recursive loop
         yieldCheck.start = computer.uptime()
 

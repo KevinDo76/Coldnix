@@ -77,72 +77,74 @@ _G.KernelPanic = function(err, tracebackErr, safePanic)
             v=string.sub(v,width+1,#v)
         until #v<1 
     end
-    --screen clear
-    if BOOTGPUPROXY.getDepth()>1 then
-        BOOTGPUPROXY.setBackground(0x0000ff)
-    else
-        BOOTGPUPROXY.setBackground(0x000000)
-    end
-    
-    BOOTGPUPROXY.setForeground(0xffffff)
-    for i=1,ry do
-        BOOTGPUPROXY.fill(1,1,rx,i," ") 
-        ewait(0.01)
-    end
-    --draw sadface
-    BOOTGPUPROXY.setForeground(0xffffff)
-    BOOTGPUPROXY.setBackground(0xffffff)
-    --eyes
-    BOOTGPUPROXY.set(5,4,"#")
-    BOOTGPUPROXY.set(4,4,"#")
-    ewait(0.05)
-    BOOTGPUPROXY.set(4,6,"#")
-    BOOTGPUPROXY.set(5,6,"#")
-    --mouth
-    BOOTGPUPROXY.set(8,4,"#")
-    BOOTGPUPROXY.set(9,4,"#")
-    ewait(0.05)
-    BOOTGPUPROXY.set(8,5,"#")
-    BOOTGPUPROXY.set(9,5,"#")
-    ewait(0.05)
-    BOOTGPUPROXY.set(8,6,"#")
-    BOOTGPUPROXY.set(9,6,"#")
-    ewait(0.05)
-    BOOTGPUPROXY.set(10,7,"#")
-    BOOTGPUPROXY.set(11,7,"#")
-    ewait(0.05)
-    BOOTGPUPROXY.set(10,3,"#")
-    BOOTGPUPROXY.set(11,3,"#")
-    ewait(0.05)
-    BOOTGPUPROXY.set(12,8,"#")
-    BOOTGPUPROXY.set(13,8,"#")
-    ewait(0.05)
-    BOOTGPUPROXY.set(12,2,"#")
-    BOOTGPUPROXY.set(13,2,"#")
-    ewait(0.05)
-    BOOTGPUPROXY.set(14,8,"#")
-    BOOTGPUPROXY.set(15,8,"#")
-    ewait(0.05)
-    BOOTGPUPROXY.set(14,2,"#")
-    BOOTGPUPROXY.set(15,2,"#")
-    ewait(0.2)
-    --outprint
-    if BOOTGPUPROXY.getDepth()>1 then
-        BOOTGPUPROXY.setBackground(0x0000ff)
-    else
-        BOOTGPUPROXY.setBackground(0x000000)
-    end
-    
-    BOOTGPUPROXY.setForeground(0xffffff)
-    for i,v in ipairs(finaChunk) do
-        if i > startScrollCount then
-            BOOTGPUPROXY.copy(1,2,rx ,ry,0,-1)
-            BOOTGPUPROXY.set(0,ry,padText("",rx))
+    if true then
+        --screen clear
+        if BOOTGPUPROXY.getDepth()>1 then
+            BOOTGPUPROXY.setBackground(0x0000ff)
+        else
+            BOOTGPUPROXY.setBackground(0x000000)
         end
-        BOOTGPUPROXY.set(4,math.min(i+9,ry),padText(v,rx-4))
-        ewait(0.1)
+        
+        BOOTGPUPROXY.setForeground(0xffffff)
+        for i=1,ry do
+            BOOTGPUPROXY.fill(1,1,rx,i," ") 
+            ewait(0.01)
+        end
+        --draw sadface
+        BOOTGPUPROXY.setForeground(0xffffff)
+        BOOTGPUPROXY.setBackground(0xffffff)
+        --eyes
+        BOOTGPUPROXY.set(5,4,"#")
+        BOOTGPUPROXY.set(4,4,"#")
+        ewait(0.05)
+        BOOTGPUPROXY.set(4,6,"#")
+        BOOTGPUPROXY.set(5,6,"#")
+        --mouth
+        BOOTGPUPROXY.set(8,4,"#")
+        BOOTGPUPROXY.set(9,4,"#")
+        ewait(0.05)
+        BOOTGPUPROXY.set(8,5,"#")
+        BOOTGPUPROXY.set(9,5,"#")
+        ewait(0.05)
+        BOOTGPUPROXY.set(8,6,"#")
+        BOOTGPUPROXY.set(9,6,"#")
+        ewait(0.05)
+        BOOTGPUPROXY.set(10,7,"#")
+        BOOTGPUPROXY.set(11,7,"#")
+        ewait(0.05)
+        BOOTGPUPROXY.set(10,3,"#")
+        BOOTGPUPROXY.set(11,3,"#")
+        ewait(0.05)
+        BOOTGPUPROXY.set(12,8,"#")
+        BOOTGPUPROXY.set(13,8,"#")
+        ewait(0.05)
+        BOOTGPUPROXY.set(12,2,"#")
+        BOOTGPUPROXY.set(13,2,"#")
+        ewait(0.05)
+        BOOTGPUPROXY.set(14,8,"#")
+        BOOTGPUPROXY.set(15,8,"#")
+        ewait(0.05)
+        BOOTGPUPROXY.set(14,2,"#")
+        BOOTGPUPROXY.set(15,2,"#")
+        ewait(0.2) 
+        --outprint
+        if BOOTGPUPROXY.getDepth()>1 then
+            BOOTGPUPROXY.setBackground(0x0000ff)
+        else
+            BOOTGPUPROXY.setBackground(0x000000)
+        end
+        
+        BOOTGPUPROXY.setForeground(0xffffff)
+        for i,v in ipairs(finaChunk) do
+            if i > startScrollCount then
+                BOOTGPUPROXY.copy(1,2,rx ,ry,0,-1)
+                BOOTGPUPROXY.set(0,ry,padText("",rx))
+            end
+            BOOTGPUPROXY.set(4,math.min(i+9,ry),padText(v,rx-4))
+            ewait(0.1)
+        end
+        printEnded = true
     end
-    printEnded = true
     while true do
         ewait(0.05)
         computer.beep(1000,0.1)
